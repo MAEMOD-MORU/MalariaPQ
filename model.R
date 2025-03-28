@@ -8,7 +8,11 @@ Malaria_model_with_Array <- function(t, state, parameters) {
     GIr <- c(GIr0, GIr1, GIr2)  # Gametocytes from Ir
 
     # Rate of gametocyte to recovery
-    drug <- c(d0, d1, d2)
+    if(t <=start_d){
+      drug <- c(d0, d0, d0)
+    }else{
+      drug <- c(d0, d1, d2)
+    }
 
     # beta_s <- c(beta_s0, beta_s1, beta_s2) # Define beta for Is subgroups
     # beta_r <- c(beta_r0, beta_r1, beta_r2) # Define beta for Ir subgroups
@@ -23,9 +27,9 @@ Malaria_model_with_Array <- function(t, state, parameters) {
     lam_r <- season * (sum(beta_r * GIr) + beta_ar * GAr) / N
 
     # Compute tau separately for each subgroup
-    tau_is <- tau[c(2,3,4)]
+    tau_is <- tau[2:4]
     tau_as <- tau[1]
-    tau_ir <- tau[c(6,7,8)]
+    tau_ir <- tau[6:8]
     tau_ar <- tau[5]
 
     # Rate of change for each state
@@ -60,8 +64,12 @@ Malaria_model_with_Array <- function(t, state, parameters) {
     inc = lam_s * S + lam_r * S + lam_s * Rs + lam_r * Rr,
     inc_s = lam_s * S + lam_s * Rs,
     inc_r = lam_r * S + lam_r * Rr,
+    total_inf = sum(Is)+sum(Ir)+As+Ar,
+    total_G = sum(GIs) + GAs+sum(GIr) + GAr,
     Gs = sum(GIs) + GAs,
     Gr = sum(GIr) + GAr,
+    Gsym = sum(GIs)+sum(GIr),
+    Gasym = GAs+GAr,
     N = N
     )
   })
