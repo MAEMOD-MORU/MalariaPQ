@@ -23,11 +23,11 @@ As_total <- init_total_IAs * (1-prob_s)
 Ir_total <- init_total_IAr * prob_r
 Ar_total <- init_total_IAr * (1-prob_r)
 
-init_D1s <- 1/3
-init_D2s <- 1/3
+init_D1s <- 2/3
+init_D2s <- 0/3
 
-init_D1r <- 1/3
-init_D2r <- 1/3
+init_D1r <- 2/3
+init_D2r <- 0/3
 
 propIs <- c(1 - (init_D1s + init_D2s), init_D1s, init_D2s) # ratio of
 propIr <- c(1 - (init_D1r + init_D2r), init_D1r, init_D2r)
@@ -498,7 +498,7 @@ lower_inc <- apply(matrix_output_inc[4500:4740,], 1, quantile, probs = 0.025, na
 upper_inc <- apply(matrix_output_inc[4500:4740,], 1, quantile, probs = 0.975, na.rm = TRUE)
 
 # Plot with confidence interval
-plot(1:nrow(matrix_output_inc[4500:4740,]), Gs, type = "l", col = "blue", lwd = 1.5, ylim = range(lower_inc, upper_inc),
+plot(1:nrow(matrix_output_inc[4500:4740,]), median_inc, type = "l", col = "blue", lwd = 1.5, ylim = range(lower_inc, upper_inc),
      ylab = "Incidence", xlab = "Months", main = "Total Incidence with 95% CI")
 
 # Add shaded region for confidence interval
@@ -528,7 +528,7 @@ upper_GIs2 <- apply(matrix_output_GIs2[4500:4740,], 1, quantile, probs = 0.975, 
 
 
 # Plot with confidence interval
-plot(1:nrow(matrix_output_GIs0[4500:4740,]), median_GIs0, type = "l", col = "green", lwd = 1.5,ylim = c(0,6000),
+plot(1:nrow(matrix_output_GIs0[4500:4740,]), median_GIs0, type = "l", col = "green", lwd = 1.5,ylim = c(0,10000),
      ylab = "Number of People Carrying Gametocytes", xlab = "Months", main = "Gametocyte Sensitive with 95% CI")
 
 # Add shaded region for confidence interval
@@ -540,22 +540,22 @@ polygon(c(1:nrow(matrix_output_GIs1[4500:4740,]), rev(1:nrow(matrix_output_GIs1[
 lines(1:nrow(matrix_output_GIs1[4500:4740,]),lower_GIs1, col="red",lty=2)
 lines(1:nrow(matrix_output_GIs1[4500:4740,]),upper_GIs1, col="red",lty=2)
 
-polygon(c(1:nrow(matrix_output_GIs2[4500:4740,]), rev(1:nrow(matrix_output_inc[4500:4740,]))), c(lower_GIs2, rev(upper_GIs2)), col = rgb(0.2, 0.2, 0.5, 0.25), border = NA)
-lines(1:nrow(matrix_output_GIs2[4500:4740,]),lower_GIs2, col="blue",lty=2)
-lines(1:nrow(matrix_output_GIs2[4500:4740,]),upper_GIs2, col="blue",lty=2)
+# polygon(c(1:nrow(matrix_output_GIs2[4500:4740,]), rev(1:nrow(matrix_output_inc[4500:4740,]))), c(lower_GIs2, rev(upper_GIs2)), col = rgb(0.2, 0.2, 0.5, 0.25), border = NA)
+# lines(1:nrow(matrix_output_GIs2[4500:4740,]),lower_GIs2, col="blue",lty=2)
+# lines(1:nrow(matrix_output_GIs2[4500:4740,]),upper_GIs2, col="blue",lty=2)
 
 # Add median line
 lines(1:nrow(matrix_output_GIs0[4500:4740,]), median_GIs0, col = rgb(0.1, 0.7, 0.1, 1), lwd = 2)
 lines(1:nrow(matrix_output_GIs1[4500:4740,]), median_GIs1, col = rgb(0.7, 0.1, 0.1, 1), lwd = 2)
-lines(1:nrow(matrix_output_GIs2[4500:4740,]), median_GIs2, col = rgb(0.1, 0.1, 0.7, 1), lwd = 2)
+# lines(1:nrow(matrix_output_GIs2[4500:4740,]), median_GIs2, col = rgb(0.1, 0.1, 0.7, 1), lwd = 2)
 
 abline(v=120,col="red",lwd=2,lty = 2)
 text(85,2000,"Start Treatment")
 abline(v=180,col="purple3",lwd=2,lty = 2)
-text(165,4000,"5 year")
+text(165,7000,"5 year")
 
-legend("topright", legend = c("No treatment", "Placebo", "0.0625 mg/kg"),
-       col = c(rgb(0.1, 0.7, 0.1, 1), rgb(0.7, 0.1, 0.1, 1), rgb(0.1, 0.1, 0.7, 1)),
+legend("topright", legend = c("No treatment", "ACT"),
+       col = c(rgb(0.1, 0.7, 0.1, 1), rgb(0.7, 0.1, 0.1, 1)),
        lwd = 2, lty = 1, bg = "white",cex = 1)
 
 
@@ -607,7 +607,7 @@ lower_GIr2 <- apply(matrix_output_GIr2[4500:4740,], 1, quantile, probs = 0.025, 
 upper_GIr2 <- apply(matrix_output_GIr2[4500:4740,], 1, quantile, probs = 0.975, na.rm = TRUE)
 
 # Plot with confidence interval
-plot(1:nrow(matrix_output_GIr0[4500:4740,]), median_GIr0, type = "l", col = "green", lwd = 1.5, ylim = range(matrix_output_GIr0, matrix_output_GIr2),
+plot(1:nrow(matrix_output_GIr0[4500:4740,]), median_GIr0, type = "l", col = "green", lwd = 1.5, ylim = range(matrix_output_GIr0, matrix_output_GIr1),
      ylab = "Number of People Carrying Gametocytes", xlab = "Months", main = "Gametocytes Resistance with 95% CI")
 
 
@@ -620,22 +620,22 @@ polygon(c(1:nrow(matrix_output_GIr1[4500:4740,]), rev(1:nrow(matrix_output_GIr1[
 lines(1:nrow(matrix_output_GIr1[4500:4740,]),lower_GIr1, col="red",lty=2)
 lines(1:nrow(matrix_output_GIr1[4500:4740,]),upper_GIr1, col="red",lty=2)
 
-polygon(c(1:nrow(matrix_output_GIr2[4500:4740,]), rev(1:nrow(matrix_output_inc[4500:4740,]))), c(lower_GIr2, rev(upper_GIr2)), col = rgb(0.2, 0.2, 0.5, 0.25), border = NA)
-lines(1:nrow(matrix_output_GIr2[4500:4740,]),lower_GIr2, col="blue",lty=2)
-lines(1:nrow(matrix_output_GIr2[4500:4740,]),upper_GIr2, col="blue",lty=2)
+# polygon(c(1:nrow(matrix_output_GIr2[4500:4740,]), rev(1:nrow(matrix_output_inc[4500:4740,]))), c(lower_GIr2, rev(upper_GIr2)), col = rgb(0.2, 0.2, 0.5, 0.25), border = NA)
+# lines(1:nrow(matrix_output_GIr2[4500:4740,]),lower_GIr2, col="blue",lty=2)
+# lines(1:nrow(matrix_output_GIr2[4500:4740,]),upper_GIr2, col="blue",lty=2)
 
 # Add median line
 lines(1:nrow(matrix_output_GIr0[4500:4740,]), median_GIr0, col = "green2", lwd = 2)
 lines(1:nrow(matrix_output_GIr1[4500:4740,]), median_GIr1, col = rgb(0.7, 0.1, 0.1, 1), lwd = 2)
-lines(1:nrow(matrix_output_GIr2[4500:4740,]), median_GIr2, col = rgb(0.1, 0.1, 0.7, 1), lwd = 2)
+# lines(1:nrow(matrix_output_GIr2[4500:4740,]), median_GIr2, col = rgb(0.1, 0.1, 0.7, 1), lwd = 2)
 
 abline(v=120,col="red",lwd=2,lty = 2)
 text(85,1000,"Start Treatment")
 abline(v=180,col="purple3",lwd=2,lty = 2)
-text(160,3000,"5 year")
+text(160,7000,"5 year")
 
-legend("topright", legend = c("No treatment", "Placebo", "0.0625 mg/kg"),
-       col = c(rgb(0.1, 0.7, 0.1, 1), rgb(0.7, 0.1, 0.1, 1), rgb(0.1, 0.1, 0.7, 1)),
+legend("topright", legend = c("No treatment", "Placebo"),
+       col = c(rgb(0.1, 0.7, 0.1, 1), rgb(0.7, 0.1, 0.1, 1)),
        lwd = 2, lty = 1, bg = "white",cex = 1)
 
 #### gametocyte resistance (Asym/Sym) ######
