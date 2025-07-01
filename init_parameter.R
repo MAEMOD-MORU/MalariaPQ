@@ -1,12 +1,3 @@
-# Run Simulation
-library(deSolve)
-
-#Read model
-source("model.r")
-
-#
-source("function.r")
-
 # Initial Population
 initP <- 70000000
 
@@ -75,39 +66,51 @@ state <- c(
 
 # Dynamic tau from UI
 τnfs <- rep(4.3,2) # Succeed to Treatment group to Recovered (Sensitive)
-τigs <- c(0.33,0.75,3.7) # Symptomatic Gametocytes to Recovered (Sensitive)
+τigs <- c(0.33,0.68,6.15) # Symptomatic Gametocytes to Recovered (Sensitive)
 τfs <-rep(0.33,2) # Fail to Treatment group to Recovered (Sensitive)
 τntsd0 <- 0.33 # D0 to Recovered (Sensitive)
 Tas <- 0.33 # Asymptomatic to Recovered (Sensitive)
 Tags <- 0.33 # Asymptomatic Gametocytes to Recovered (Sensitive)
 
 τnfr <- rep(4.3,2)  # Succeed to Treatment group to Recovered (Resistant)
-τigr <- c(0.33,0.75,3.7) # Symptomatic Gametocytes to Recovered (Resistant)
+τigr <- c(0.33,0.68,6.15) # Symptomatic Gametocytes to Recovered (Resistant)
 τfr <- rep(0.33,2) # Fail to Treatment group to Recovered (Resistant)
 τntrd0 <- 0.33 # D0 to Recovered (Resistant)
 Tar <- 0.33 # Asymptomatic to Recovered (Resistant)
 Tagr <- 0.33 # Asymptomatic Gametocytes to Recovered (Resistant)
 
-beta_s0 = 1.45
-beta_s1 = 1.45
-beta_s2 = 1.45
-beta_r0 = 1.45
-beta_r1 = 1.45
-beta_r2 = 1.45
+g_is = c(0.121,0.121,0.121) #0.1
+g_ir = c(0.242,0.242,0.242)
 
-parameters_10_year <- list(
+g_as = 0.186
+g_ar = 0.372
+
+g_infs = c(0.019,0.019)
+g_ifs = c(1.21,1.21)  #1
+
+g_infr = c(0.038,0.038)
+g_ifr = c(2.42,2.42) 
+
+beta_s0 = 1.0625
+beta_s1 = 1.0625
+beta_s2 = 1.0625
+beta_r0 = 1.0625
+beta_r1 = 1.0625
+beta_r2 = 1.0625
+
+parameters <- list(
   mui = (1 / 50) / 12,
   muo = (1 / 50) / 12,
-  flo = 1,
-  amp = 0.25,
+  flo = 0.9,
+  amp = 0.1,
   period = 12,
   phase = 0,
   prob_s = prob_s,
   prob_r = prob_r,
-  start_d = 3620,# 10 years after 3500 months
+  start_d = 4620,# 10 years after 3500 months
   t_long = 12*10, # 2,5,10 years 
-  Fail_rate_s = 0.1, # Fail Treatment of ACT
-  Fail_rate_r = 0.5,
+  Fail_rate_s = 0.025, # Fail Treatment of ACT
+  Fail_rate_r = 0.13,
   
   beta_s = c(beta_s0, beta_s1, beta_s2),
   beta_r = c(beta_r0, beta_r1,beta_r2),
@@ -116,15 +119,15 @@ parameters_10_year <- list(
   
   alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
   τigs=τigs,
-  tau_as=Tas,
-  tau_ags=Tagr,
+  Tas=Tas,
+  Tags=Tags,
   
   τigr=τigr,
-  tau_ar=Tar,
-  tau_agr=Tags,
+  Tar=Tar,
+  Tagr=Tagr,
   
-  tau_ntsd0= τntsd0,
-  tau_ntrd0= τntrd0,
+  τntsd0= τntsd0,
+  τntrd0= τntrd0,
   
   τnfs = τnfs ,
   τfs = τfs ,
@@ -134,32 +137,32 @@ parameters_10_year <- list(
   
   d0 = (1 / 90) * 30, # no drugs
   d1 = (1 / 44.1) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row Placebo (DP), column microscopy
-  d2 = (1 / 7.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
+  d2 = (1 / 4.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
   
-  gamma_is = c(0.1,0.1,0.1), #0.1
-  gamma_ir = c(0.1,0.1,0.1),
-  gamma_ar = 0.1,
-  gamma_as = 0.1,
-  gamma_infs = c(0.01,0.01),
-  gamma_ifs = c(1,1) *10, #1
-  gamma_infr = c(0.01,0.01),
-  gamma_ifr = c(1,1) *10,
-  prob_lam = 0.7
+  g_is = g_is, #0.1
+  g_ir = g_ir,
+  g_ar = g_ar,
+  g_as = g_as,
+  g_infs = g_infs,
+  g_ifs = g_ifs,  #1
+  g_infr = g_infr,
+  g_ifr = g_ifr,
+  prob_res = 0.7
 )
 
-parameters_5_year <- list(
+parameters_5 <- list(
   mui = (1 / 50) / 12,
   muo = (1 / 50) / 12,
-  flo = 1,
-  amp = 0.25,
+  flo = 0.9,
+  amp = 0.1,
   period = 12,
   phase = 0,
   prob_s = prob_s,
   prob_r = prob_r,
-  start_d = 3620,# 10 years after 3500 months
+  start_d = 4620,# 10 years after 3500 months
   t_long = 12*5, # 2,5,10 years 
-  Fail_rate_s = 0.1, # Fail Treatment of ACT
-  Fail_rate_r = 0.5,
+  Fail_rate_s = 0.025, # Fail Treatment of ACT
+  Fail_rate_r = 0.13,
   
   beta_s = c(beta_s0, beta_s1, beta_s2),
   beta_r = c(beta_r0, beta_r1,beta_r2),
@@ -168,15 +171,15 @@ parameters_5_year <- list(
   
   alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
   τigs=τigs,
-  tau_as=Tas,
-  tau_ags=Tagr,
+  Tas=Tas,
+  Tags=Tags,
   
   τigr=τigr,
-  tau_ar=Tar,
-  tau_agr=Tags,
+  Tar=Tar,
+  Tagr=Tagr,
   
-  tau_ntsd0= τntsd0,
-  tau_ntrd0= τntrd0,
+  τntsd0= τntsd0,
+  τntrd0= τntrd0,
   
   τnfs = τnfs ,
   τfs = τfs ,
@@ -186,32 +189,32 @@ parameters_5_year <- list(
   
   d0 = (1 / 90) * 30, # no drugs
   d1 = (1 / 44.1) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row Placebo (DP), column microscopy
-  d2 = (1 / 7.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
+  d2 = (1 / 4.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
   
-  gamma_is = c(0.1,0.1,0.1), #0.1
-  gamma_ir = c(0.1,0.1,0.1),
-  gamma_ar = 0.1,
-  gamma_as = 0.1,
-  gamma_infs = c(0.01,0.01),
-  gamma_ifs = c(1,1) , #1
-  gamma_infr = c(0.01,0.01),
-  gamma_ifr = c(1,1) ,
-  prob_lam = 0.7
+  g_is = g_is, #0.1
+  g_ir = g_ir,
+  g_ar = g_ar,
+  g_as = g_as,
+  g_infs = g_infs,
+  g_ifs = g_ifs,  #1
+  g_infr = g_infr,
+  g_ifr = g_ifr,
+  prob_res = 0.7
 )
 
-parameters_2_year <- list(
+parameters_2 <- list(
   mui = (1 / 50) / 12,
   muo = (1 / 50) / 12,
-  flo = 1,
-  amp = 0.25,
+  flo = 0.9,
+  amp = 0.1,
   period = 12,
   phase = 0,
   prob_s = prob_s,
   prob_r = prob_r,
-  start_d = 3620,# 10 years after 3500 months
+  start_d = 4620,# 10 years after 3500 months
   t_long = 12*2, # 2,5,10 years 
-  Fail_rate_s = 0.1, # Fail Treatment of ACT
-  Fail_rate_r = 0.5,
+  Fail_rate_s = 0.025, # Fail Treatment of ACT
+  Fail_rate_r = 0.13,
   
   beta_s = c(beta_s0, beta_s1, beta_s2),
   beta_r = c(beta_r0, beta_r1,beta_r2),
@@ -220,15 +223,15 @@ parameters_2_year <- list(
   
   alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
   τigs=τigs,
-  tau_as=Tas,
-  tau_ags=Tagr,
+  Tas=Tas,
+  Tags=Tags,
   
   τigr=τigr,
-  tau_ar=Tar,
-  tau_agr=Tags,
+  Tar=Tar,
+  Tagr=Tagr,
   
-  tau_ntsd0= τntsd0,
-  tau_ntrd0= τntrd0,
+  τntsd0= τntsd0,
+  τntrd0= τntrd0,
   
   τnfs = τnfs ,
   τfs = τfs ,
@@ -238,42 +241,17 @@ parameters_2_year <- list(
   
   d0 = (1 / 90) * 30, # no drugs
   d1 = (1 / 44.1) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row Placebo (DP), column microscopy
-  d2 = (1 / 7.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
+  d2 = (1 / 4.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
   
-  gamma_is = c(0.1,0.1,0.1), #0.1
-  gamma_ir = c(0.1,0.1,0.1),
-  gamma_ar = 0.1,
-  gamma_as = 0.1,
-  gamma_infs = c(0.01,0.01),
-  gamma_ifs = c(1,1) *10, #1
-  gamma_infr = c(0.01,0.01),
-  gamma_ifr = c(1,1) *10,
-  prob_lam = 0.7
+  g_is = g_is, #0.1
+  g_ir = g_ir,
+  g_ar = g_ar,
+  g_as = g_as,
+  g_infs = g_infs,
+  g_ifs = g_ifs,  #1
+  g_infr = g_infr,
+  g_ifr = g_ifr,
+  prob_res = 0.7
 )
 
-times <- seq(0, 4000, by = 1)
-
-out_2_year<- ode(y = state, times = times, func = Malaria_model_with_Array_2, parms = parameters_2_year)
-out_5_year<- ode(y = state, times = times, func = Malaria_model_with_Array_2, parms = parameters_5_year)
-out_10_year<- ode(y = state, times = times, func = Malaria_model_with_Array_2, parms = parameters_10_year)
-
-# 10 year
-plot(out[(4500):(4500+360),"inc"],type="l",xlab="Months",ylab="Incidence",main="Total Incidence (2,5,10 year treatment)",col=1,ylim = c(0,1.5e5))
-# 5 year
-lines(out_5[(4500):(4500+360),"inc"],type="l",col=2)
-# 2 year
-lines(out_2[(4500):(4500+360),"inc"],type="l",col=3)
-
-abline(v=120,col="blue")
-text(85,50000,"start\n treatment")
-abline(v=180-36,col="green4")
-text(160,145000,"2\n years")
-abline(v=180,col="red3")
-text(200,145000,"5\n years")
-abline(v=240,col="black")
-text(260,145000,"10\n years")
-
-legend("bottomleft", legend = c("2 years", "5 years", "10 years"),
-       col = c(rgb(0.1, 0.7, 0.1, 1), rgb(0.7, 0.1, 0.1, 1), rgb(0, 0, 0, 1)),
-       lwd = 2, lty = 1, bg = "white",cex = 1)
-
+times <- seq(0, 5000, by = 1)
