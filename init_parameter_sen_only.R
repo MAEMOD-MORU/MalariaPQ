@@ -1,9 +1,13 @@
 # Initial Population
-initP <- 70000000
+initP <- 24000150
+
+total_inc <- 1000
+
+prob_res <-0
 
 # Initial States from UI Inputs
-init_total_IAs <- 10
-init_total_IAr <- 10
+init_total_IAs <- total_inc*(1-prob_res)
+init_total_IAr <- total_inc*(prob_res)
 
 prob_s = 0.25 # Ratio of infection on sym/asym sensitive group
 prob_r = 0.25 # Ratio of infection on sym/asym resistance group
@@ -91,23 +95,32 @@ g_ifs = c(1.21,1.21)  #1
 g_infr = c(0.038,0.038)
 g_ifr = c(2.42,2.42) 
 
-beta_s0 = 1.0625
-beta_s1 = 1.0625
-beta_s2 = 1.0625
-beta_r0 = 1.0625
-beta_r1 = 1.0625
-beta_r2 = 1.0625
+beta_s0 = 1.1
+beta_s1 = 1.1
+beta_s2 = 1.1
+beta_r0 = 1.1
+beta_r1 = 1.1
+beta_r2 = 1.1
+
+# mui <- 0.02225837  # Monthly mortality rate for birth
+# muo <- 0.01995414 # Monthly mortality rate for death
+
+mui <- 0.01
+muo <- 0.01
 
 parameters <- list(
-  mui = (1 / 50) / 12,
-  muo = (1 / 50) / 12,
+  mui = mui,
+  muo = muo,
+  mui_2025 =mui,
+  muo_2025 =muo,
+  start_m = 12*25,
   flo = 0.9,
   amp = 0.1,
   period = 12,
   phase = 0,
   prob_s = prob_s,
   prob_r = prob_r,
-  start_d = 4620,# 10 years after 3500 months
+  start_d = 6620,# 10 years after 3500 months
   t_long = 12*10, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
   Fail_rate_r = 0.13,
@@ -147,7 +160,7 @@ parameters <- list(
   g_ifs = g_ifs,  #1
   g_infr = g_infr,
   g_ifr = g_ifr,
-  prob_res = 0.7
+  prob_res = 0.3
 )
 
 parameters_5 <- list(
@@ -254,4 +267,4 @@ parameters_2 <- list(
   prob_res = 0.7
 )
 
-times <- seq(0, 5000, by = 1)
+times <- seq(0, 6000, by = 1)
