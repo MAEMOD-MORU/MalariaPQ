@@ -9,14 +9,14 @@ prob_res <-0
 init_total_IAs <- total_inc*(1-prob_res)
 init_total_IAr <- total_inc*(prob_res)
 
-prob_s = 0.25 # Ratio of infection on sym/asym sensitive group
-prob_r = 0.25 # Ratio of infection on sym/asym resistance group
+prob_sym_s = 0.25 # Ratio of infection on sym/asym sensitive group
+prob_sym_r = 0.25 # Ratio of infection on sym/asym resistance group
 
-Is_total <- init_total_IAs * prob_s
-As_total <- init_total_IAs * (1-prob_s)
+Is_total <- init_total_IAs * prob_sym_s
+As_total <- init_total_IAs * (1-prob_sym_s)
 
-Ir_total <- init_total_IAr * prob_r
-Ar_total <- init_total_IAr * (1-prob_r)
+Ir_total <- init_total_IAr * prob_sym_r
+Ar_total <- init_total_IAr * (1-prob_sym_r)
 
 init_D1s <- 1/3
 init_D2s <- 1/3
@@ -95,40 +95,47 @@ g_ifs = c(1.21,1.21)  #1
 g_infr = c(0.038,0.038)
 g_ifr = c(2.42,2.42) 
 
-beta_s0 = 1.1
-beta_s1 = 1.1
-beta_s2 = 1.1
-beta_r0 = 1.1
-beta_r1 = 1.1
-beta_r2 = 1.1
+beta_is = 5.075126       
+beta_as = 1.81449     
+beta_is_2 = 3.827039      
+beta_as_2 = 1.455645     
+beta_r = 2.909059     
+beta_ar = 1.052895     
 
-# mui <- 0.02225837  # Monthly mortality rate for birth
-# muo <- 0.01995414 # Monthly mortality rate for death
+mui <- 0.01681178 # Monthly mortality rate for birth
+muo <- 0.01400283 # Monthly mortality rate for death
+mui_before <- 0.01233062 # Monthly mortality rate for birth
+muo_before <- 0.01047908 # Monthly mortality rate for death
 
-mui <- 0.01
-muo <- 0.01
+# mui <- 0.01
+# muo <- 0.01
 
 parameters <- list(
   mui = mui,
   muo = muo,
-  mui_2025 =mui,
-  muo_2025 =muo,
-  start_m = 12*25,
+  mui_before = mui_before,
+  muo_before = muo_before,
   flo = 0.9,
   amp = 0.1,
+  propIs=propIs,
+  propIr=propIr,
   period = 12,
   phase = 0,
-  prob_s = prob_s,
-  prob_r = prob_r,
-  start_d = 6620,# 10 years after 3500 months
-  t_long = 12*10, # 2,5,10 years 
+  prob_sym_s = prob_sym_s,
+  prob_sym_r = prob_sym_r,
+  start_m = 12*15, # change birth rate 2015
+  start_b = 12*14, # change all beta at 2014
+  start_d = 6000,# start start using drug campaign 
+  t_long = 12*100, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
   Fail_rate_r = 0.13,
   
-  beta_s = c(beta_s0, beta_s1, beta_s2),
-  beta_r = c(beta_r0, beta_r1,beta_r2),
-  beta_as = beta_s0,
-  beta_ar = beta_r0,
+  beta_s = c(beta_is, beta_is, beta_is),
+  beta_r = c(beta_r, beta_r,beta_r),
+  beta_as = beta_as,
+  beta_ar = beta_ar,
+  beta_s_2 =  c(beta_is_2, beta_is_2, beta_is_2),
+  beta_as_2 = beta_as_2,
   
   alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
   τigs=τigs,
@@ -160,7 +167,7 @@ parameters <- list(
   g_ifs = g_ifs,  #1
   g_infr = g_infr,
   g_ifr = g_ifr,
-  prob_res = 0.3
+  prob_res = 0.05
 )
 
 parameters_5 <- list(
@@ -170,17 +177,19 @@ parameters_5 <- list(
   amp = 0.1,
   period = 12,
   phase = 0,
-  prob_s = prob_s,
-  prob_r = prob_r,
+  prob_sym_s = prob_sym_s,
+  prob_sym_r = prob_sym_r,
   start_d = 4620,# 10 years after 3500 months
   t_long = 12*5, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
   Fail_rate_r = 0.13,
   
-  beta_s = c(beta_s0, beta_s1, beta_s2),
-  beta_r = c(beta_r0, beta_r1,beta_r2),
-  beta_as = beta_s0,
-  beta_ar = beta_r0,
+  beta_s = c(beta_is, beta_is, beta_is),
+  beta_r = c(beta_r, beta_r,beta_r),
+  beta_as = beta_is,
+  beta_ar = beta_r,
+  beta_s_before =c(beta_is, beta_is, beta_is),
+  beta_as_before =beta_is,
   
   alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
   τigs=τigs,
@@ -222,17 +231,17 @@ parameters_2 <- list(
   amp = 0.1,
   period = 12,
   phase = 0,
-  prob_s = prob_s,
-  prob_r = prob_r,
+  prob_sym_s = prob_sym_s,
+  prob_sym_r = prob_sym_r,
   start_d = 4620,# 10 years after 3500 months
   t_long = 12*2, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
   Fail_rate_r = 0.13,
   
-  beta_s = c(beta_s0, beta_s1, beta_s2),
-  beta_r = c(beta_r0, beta_r1,beta_r2),
-  beta_as = beta_s0,
-  beta_ar = beta_r0,
+  beta_s = c(beta_is, beta_is, beta_is),
+  beta_r = c(beta_r, beta_r,beta_r),
+  beta_as = beta_is,
+  beta_ar = beta_r,
   
   alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
   τigs=τigs,
