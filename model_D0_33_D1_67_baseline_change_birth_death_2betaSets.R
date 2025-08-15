@@ -1,6 +1,6 @@
 # Model Baseline (D0 33%, D1 67%) file 
 ##### 2 #####
-Malaria_model_with_Array_d2<- function(t, state, parameters) {
+Malaria_model_with_Array<- function(t, state, parameters) {
   with(as.list(c(state, parameters)), {
     # Define variables
     Is <- c(Is0, Is1, Is2) # Recreate Is array from individual components
@@ -62,11 +62,11 @@ Malaria_model_with_Array_d2<- function(t, state, parameters) {
       tau_is <- c(d0, d1, d1)
       tau_nfs <- c(d1, d1)
       tau_fs <- c(d1, d1)
-      
+
       tau_ir <- c(d0, d1, d1)
       tau_nfr <- c(d1, d1)
       tau_fr <- c(d1, d1)
-      
+
     }else if(t <=(start_d+t_long)){
       
       # print(T)
@@ -77,11 +77,11 @@ Malaria_model_with_Array_d2<- function(t, state, parameters) {
       gamma_infr <- g_infr 
       gamma_ifr <- g_ifr  
       
-      tau_is <- c(d0, d2, d2)
+      tau_is <- c(d0, d1, d2)
       tau_nfs <- τnfs
       tau_fs <- τfs
       
-      tau_ir <- c(d0, d2, d2)
+      tau_ir <- c(d0, d1, d2)
       tau_nfr <- τnfr
       tau_fr <- τfr
     }else{
@@ -147,7 +147,6 @@ Malaria_model_with_Array_d2<- function(t, state, parameters) {
     
     dRr <- -muo * Rr + tau_ar * Ar - alpha * Rr + sum(tau_ir * GIr) + (tau_agr * GAr) + tau_ntrd0 * Ir[1] + sum(Stir * tau_nfr) + sum(Fir * tau_fr)
     
-    
     # Return the rate of change
     list(c(
       dS,
@@ -184,7 +183,9 @@ Malaria_model_with_Array_d2<- function(t, state, parameters) {
     GR_inc = sum(lam_ir * GIr) + sum(lam_ar * GAr),
     Gsym_inc = sum(lam_is * GIs) + sum(lam_ir * GIr),
     Gasym_inc = sum(lam_as * GAs) + sum(lam_ar * GAr),
-    N = N
+    N = N,
+    sym = sum(Is) + sum(Ir) + sum(Stis) +sum(Stir) +sum(Fis) + sum(Fir) +sum(GIs) + sum(GIr),
+    asym = As+Ar+GAs+GAr
     
     
     )

@@ -9,8 +9,8 @@ prob_res <-0
 init_total_IAs <- total_inc*(1-prob_res)
 init_total_IAr <- total_inc*(prob_res)
 
-prob_sym_s = 0.25 # Ratio of infection on sym/asym sensitive group
-prob_sym_r = 0.25 # Ratio of infection on sym/asym resistance group
+prob_sym_s = 0.25 # proportion of infection on sym sensitive group
+prob_sym_r = 0.25 # proportion of infection on sym resistance group
 
 Is_total <- init_total_IAs * prob_sym_s
 As_total <- init_total_IAs * (1-prob_sym_s)
@@ -123,9 +123,9 @@ parameters <- list(
   phase = 0,
   prob_sym_s = prob_sym_s,
   prob_sym_r = prob_sym_r,
-  start_m = 12*15, # change birth rate 2015
-  start_b = 12*14, # change all beta at 2014
-  start_d = 6000,# start start using drug campaign 
+  start_d = 6000,# 10 years after 3500 months
+  start_m = 12*15, # 2015
+  start_b = 12*14, # 2015
   t_long = 12*100, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
   Fail_rate_r = 0.13,
@@ -170,110 +170,4 @@ parameters <- list(
   prob_res = 0.05
 )
 
-parameters_5 <- list(
-  mui = (1 / 50) / 12,
-  muo = (1 / 50) / 12,
-  flo = 0.9,
-  amp = 0.1,
-  period = 12,
-  phase = 0,
-  prob_sym_s = prob_sym_s,
-  prob_sym_r = prob_sym_r,
-  start_d = 4620,# 10 years after 3500 months
-  t_long = 12*5, # 2,5,10 years 
-  Fail_rate_s = 0.025, # Fail Treatment of ACT
-  Fail_rate_r = 0.13,
-  
-  beta_s = c(beta_is, beta_is, beta_is),
-  beta_r = c(beta_r, beta_r,beta_r),
-  beta_as = beta_is,
-  beta_ar = beta_r,
-  beta_s_before =c(beta_is, beta_is, beta_is),
-  beta_as_before =beta_is,
-  
-  alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
-  τigs=τigs,
-  Tas=Tas,
-  Tags=Tags,
-  
-  τigr=τigr,
-  Tar=Tar,
-  Tagr=Tagr,
-  
-  τntsd0= τntsd0,
-  τntrd0= τntrd0,
-  
-  τnfs = τnfs ,
-  τfs = τfs ,
-  
-  τnfr=τnfr,
-  τfr=τfr,
-  
-  d0 = (1 / 90) * 30, # no drugs
-  d1 = (1 / 44.1) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row Placebo (DP), column microscopy
-  d2 = (1 / 4.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
-  
-  g_is = g_is, #0.1
-  g_ir = g_ir,
-  g_ar = g_ar,
-  g_as = g_as,
-  g_infs = g_infs,
-  g_ifs = g_ifs,  #1
-  g_infr = g_infr,
-  g_ifr = g_ifr,
-  prob_res = 0.7
-)
-
-parameters_2 <- list(
-  mui = (1 / 50) / 12,
-  muo = (1 / 50) / 12,
-  flo = 0.9,
-  amp = 0.1,
-  period = 12,
-  phase = 0,
-  prob_sym_s = prob_sym_s,
-  prob_sym_r = prob_sym_r,
-  start_d = 4620,# 10 years after 3500 months
-  t_long = 12*2, # 2,5,10 years 
-  Fail_rate_s = 0.025, # Fail Treatment of ACT
-  Fail_rate_r = 0.13,
-  
-  beta_s = c(beta_is, beta_is, beta_is),
-  beta_r = c(beta_r, beta_r,beta_r),
-  beta_as = beta_is,
-  beta_ar = beta_r,
-  
-  alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
-  τigs=τigs,
-  Tas=Tas,
-  Tags=Tags,
-  
-  τigr=τigr,
-  Tar=Tar,
-  Tagr=Tagr,
-  
-  τntsd0= τntsd0,
-  τntrd0= τntrd0,
-  
-  τnfs = τnfs ,
-  τfs = τfs ,
-  
-  τnfr=τnfr,
-  τfr=τfr,
-  
-  d0 = (1 / 90) * 30, # no drugs
-  d1 = (1 / 44.1) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row Placebo (DP), column microscopy
-  d2 = (1 / 4.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
-  
-  g_is = g_is, #0.1
-  g_ir = g_ir,
-  g_ar = g_ar,
-  g_as = g_as,
-  g_infs = g_infs,
-  g_ifs = g_ifs,  #1
-  g_infr = g_infr,
-  g_ifr = g_ifr,
-  prob_res = 0.7
-)
-
-times <- seq(0, 6000, by = 1)
+times <- seq(0, 12*36, 1) # 12 months per year, 36 years (2000-2035)
