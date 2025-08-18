@@ -53,9 +53,11 @@ ui <- dashboardPage(
   dashboardHeader(title = "Malaria"),
   dashboardSidebar(
     sidebarMenu(
-      menuItem("Incidence", tabName = "incidence", icon = icon("chart-line")),
-      menuItem("Gametocyte", tabName = "gametocyte", icon = icon("bug")),
-      br(),
+      h3("transmissibility"),
+      sliderInput("Bss", "Beta of Symptomatic Sensitive", min = 0, max = 10,step = 0.01,value = parameters$beta_s_2[1]),
+      sliderInput("Bas", "Beta of Asymptomatic Sensitive", min = 0, max = 10,step = 0.01, value = parameters$beta_as_2),
+      sliderInput("Bsr", "Beta of Symptomatic Resistant", min = 0, max = 10,step = 0.01, value = parameters$beta_r[1]),
+      sliderInput("Bar", "Beta of Asymptomatic Resistant", min = 0, max = 10,step = 0.01, value =  parameters$beta_ar),
       sliderInput("start_res","Number of res (%):",min = 0,max = 50,step = 1,value = parameters$prob_res*100),
       sliderInput("prop_sym","proportion of symptomatic :",min = 0.01,max = 1,step = 0.01,value = (25/75)),
       h4("Proportion of D0,D1,D2"),
@@ -66,19 +68,13 @@ ui <- dashboardPage(
     )
   ),
   dashboardBody(
-    tabItems(
-      tabItem(tabName = "incidence",
-              fluidRow(box(width = 12, plotOutput("distPlot"))),
-              fluidRow(
-                box(width = 6, plotOutput("Plot_sym_asym")),
-                box(width = 6, plotOutput("Plot_s_r"))
-              )
-      ),
-      tabItem(tabName = "gametocyte",
-              fluidRow(box(width = 12, plotOutput("Plot_Gasym_sym"))),
-              fluidRow(box(width = 12, plotOutput("Plot_GS_GR")))
-      )
-    )
+    tabsetPanel(id="main",
+                tabPanel(title="Total Incidence",plotOutput("distPlot")),
+                tabPanel(title="Symtomatic/Asymtomatic Incidence",plotOutput("Plot_sym_asym")),
+                tabPanel(title="Sensitive/Resistant Incidence",plotOutput("Plot_s_r")),
+                tabPanel(title="Symtomatic/Asymtomatic Gametocyte Infections",plotOutput("Plot_Gasym_sym")),
+                tabPanel(title="Sensitive/Resistant Gametocyte Infections",plotOutput("Plot_GS_GR"))
+                ),
   )
 )
 
@@ -184,6 +180,19 @@ server <- function(input, output, session) {
     )
   })
   
+  observeEvent(input$Bss, {
+    values$parameters$beta_s_2 <- c(input$Bss,input$Bss,input$Bss)
+  })
+  observeEvent(input$Bas, {
+    values$parameters$beta_as_2 <- input$Bas
+  })
+  observeEvent(input$Bsr, {
+    values$parameters$beta_r <- c(input$Bsr,input$Bsr,input$Bsr)
+  })
+  observeEvent(input$Bar, {
+    values$parameters$beta_ar <- input$Bar
+  })
+  
   observeEvent(input$prop_sym, {
     values$parameters$prob_sym_s <- input$prop_sym
     values$parameters$prob_sym_r <- input$prop_sym
@@ -268,7 +277,7 @@ server <- function(input, output, session) {
          xlab = "Years", ylab = "Incidence",lty = 2,
          main = "Gametocyte Infections Asymptomatic/Symptomatic by Year",
          xlim = c(2023, 2035), lwd = 2, col = 3,
-         ylim = c(0, 1.2 * max(out_in_year[1:35, "Gasym_inc"])))
+         ylim = c(0, 1.2 * max(out_in_year_baseline[1:35, "Gasym_inc"],out_in_year_baseline[1:35, "Gsym_inc"])))
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "Gasym_inc"], lty = 1, lwd = 2, col = 3)
     lines(out_in_year[, 1], out_in_year[, "Gsym_inc"], lwd = 2,lty = 2, col = "blue")
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "Gsym_inc"], lwd = 2, col = "blue")
@@ -284,7 +293,7 @@ server <- function(input, output, session) {
          xlab = "Years", ylab = "Incidence",
          main = "Gametocyte Infections Sensitive/Resistant by Year",
          xlim = c(2023, 2035), lwd = 2, col = 1,lty = 2,
-         ylim = c(0, 1.2 * max(out_in_year[1:35, "GR_inc"])))
+         ylim = c(0, 1.2 * max(out_in_year_baseline[1:35, "GR_inc"],out_in_year_baseline[1:35, "GS_inc"])))
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "GS_inc"], lty = 1, lwd = 2)
     lines(out_in_year[, 1], out_in_year[, "GR_inc"], lwd = 2,lty = 2, col = "red")
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "GR_inc"], lwd = 2, col = "red")
