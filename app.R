@@ -53,18 +53,33 @@ ui <- dashboardPage(
   dashboardHeader(title = "Malaria"),
   dashboardSidebar(
     sidebarMenu(
-      h3("transmissibility"),
-      sliderInput("Bss", "Beta of Symptomatic Sensitive", min = 0, max = 10,step = 0.01,value = parameters$beta_s_2[1]),
-      sliderInput("Bas", "Beta of Asymptomatic Sensitive", min = 0, max = 10,step = 0.01, value = parameters$beta_as_2),
+      menuItem("Transmissibility", tabName = "transmissibility", icon = icon("bug"),
+               fluidRow(
+      sliderInput("Bss", "Beta of Symptomatic Sensitive (2000-2014)", min = 0, max = 10,step = 0.01,value = parameters$beta_s[1]),
+      sliderInput("Bas", "Beta of Asymptomatic Sensitive (2000-2014)", min = 0, max = 10,step = 0.01, value = parameters$beta_as),
+      sliderInput("Bss2", "Beta of Symptomatic Sensitive (2014-2035)", min = 0, max = 10,step = 0.01,value = parameters$beta_s_2[1]),
+      sliderInput("Bas2", "Beta of Asymptomatic Sensitive (2014-2035)", min = 0, max = 10,step = 0.01, value = parameters$beta_as_2),
       sliderInput("Bsr", "Beta of Symptomatic Resistant", min = 0, max = 10,step = 0.01, value = parameters$beta_r[1]),
-      sliderInput("Bar", "Beta of Asymptomatic Resistant", min = 0, max = 10,step = 0.01, value =  parameters$beta_ar),
+      sliderInput("Bar", "Beta of Asymptomatic Resistant", min = 0, max = 10,step = 0.01, value =  parameters$beta_ar)
+               )
+      ),
+      menuItem("res/sym", tabName = "drugs", icon = icon("bug"),
       sliderInput("start_res","Number of res (%):",min = 0,max = 50,step = 1,value = parameters$prob_res*100),
-      sliderInput("prop_sym","proportion of symptomatic :",min = 0.01,max = 1,step = 0.01,value = (25/75)),
-      h4("Proportion of D0,D1,D2"),
-      sliderInput("D0", "proportion of D0", min = 0, max = 1, value = 0.34, step = 0.01),
-      sliderInput("D1", "proportion of D1", min = 0, max = 1, value = 0.33, step = 0.01),
-      sliderInput("D2", "proportion of D2", min = 0, max = 1, value = 0.33, step = 0.01),
-      sliderInput("D2_start","start of D2 (year) :",min = 2023,max = 2033,step = 1,value = 2025)
+      sliderInput("prop_sym","proportion of symptomatic :",min = 0.01,max = 1,step = 0.01,value = (25/75))
+      ),
+      menuItem("Drugs", tabName = "drugs", icon = icon("bug"),
+               fluidRow(
+                sliderInput("D2_start","start of D2 (year) :",min = 2020,max = 2033,step = 1,value = 2025),
+                sliderInput("D0", "proportion of D0", min = 0, max = 1, value = 0.34, step = 0.01),
+                sliderInput("D1", "proportion of D1", min = 0, max = 1, value = 0.33, step = 0.01),
+                sliderInput("D2", "proportion of D2", min = 0, max = 1, value = 0.33, step = 0.01),
+               )
+      ),
+      menuItem("Visualization", tabName = "visualization", icon = icon("chart-line"),
+               fluidRow(
+                 sliderInput("time_x","Time (years):",min = 2000,max = 2035,step = 1,value = 2014),
+               )
+      )
     )
   ),
   dashboardBody(
@@ -181,10 +196,16 @@ server <- function(input, output, session) {
   })
   
   observeEvent(input$Bss, {
-    values$parameters$beta_s_2 <- c(input$Bss,input$Bss,input$Bss)
+    values$parameters$beta_s <- c(input$Bss,input$Bss,input$Bss)
   })
   observeEvent(input$Bas, {
-    values$parameters$beta_as_2 <- input$Bas
+    values$parameters$beta_as <- input$Bas
+  })
+  observeEvent(input$Bss2, {
+    values$parameters$beta_s_2 <- c(input$Bss2,input$Bss2,input$Bss2)
+  })
+  observeEvent(input$Bas2, {
+    values$parameters$beta_as_2 <- input$Bas2
   })
   observeEvent(input$Bsr, {
     values$parameters$beta_r <- c(input$Bsr,input$Bsr,input$Bsr)
@@ -230,7 +251,7 @@ server <- function(input, output, session) {
     plot(out_in_year[, 1], out_in_year[, "inc"], type = "l",
          xlab = "Years", ylab = "Incidence",
          main = "Total Incidence by Year",
-         xlim = c(2023, 2035), lwd = 2, lty = 2,
+         xlim = c(input$time_x, 2035), lwd = 2, lty = 2,
          col = 1, ylim = c(0, 1.2 * max(out_in_year[1:35, "inc"])))
     points(2000:2022, uganda_Incidence[1:23, 2], col = "red", pch = 19)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc"], lwd = 2)
@@ -244,7 +265,7 @@ server <- function(input, output, session) {
     plot(out_in_year[, 1], out_in_year[, "inc_sym"], type = "l",
          xlab = "Years", ylab = "Incidence",
          main = "Symptomatic/Asymptomatic Incidence by Year",
-         xlim = c(2023, 2035), lwd = 2, lty = 2,
+         xlim = c(input$time_x, 2035), lwd = 2, lty = 2,
          col = "blue2", ylim = c(0, 1.2 * max(c(out_in_year[1:35, "inc_sym"], out_in_year[1:35, "inc_asym"]))))
     lines(out_in_year[, 1], out_in_year[, "inc_asym"], col = "green4", lty = 2, lwd = 2)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc_sym"], col = "blue2", lwd = 2)
@@ -260,7 +281,7 @@ server <- function(input, output, session) {
     plot(out_in_year[, 1], out_in_year[, "inc_s"], type = "l",
          xlab = "Years", ylab = "Incidence",
          main = "Sensitive/Resistant Incidence by Year",
-         xlim = c(2023, 2035), lwd = 2, lty = 2,
+         xlim = c(input$time_x, 2035), lwd = 2, lty = 2,
          col = "black", ylim = c(0, 1.2 * max(c(out_in_year[1:35, "inc_s"], out_in_year[1:35, "inc_r"]))))
     lines(out_in_year[, 1], out_in_year[, "inc_r"], col = "red", lty = 2, lwd = 2)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc_r"], col = "red", lwd = 2)
@@ -276,7 +297,7 @@ server <- function(input, output, session) {
     plot(out_in_year[, 1], out_in_year[, "Gasym_inc"], type = "l",
          xlab = "Years", ylab = "Incidence",lty = 2,
          main = "Gametocyte Infections Asymptomatic/Symptomatic by Year",
-         xlim = c(2023, 2035), lwd = 2, col = 3,
+         xlim = c(input$time_x, 2035), lwd = 2, col = 3,
          ylim = c(0, 1.2 * max(out_in_year_baseline[1:35, "Gasym_inc"],out_in_year_baseline[1:35, "Gsym_inc"])))
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "Gasym_inc"], lty = 1, lwd = 2, col = 3)
     lines(out_in_year[, 1], out_in_year[, "Gsym_inc"], lwd = 2,lty = 2, col = "blue")
@@ -292,7 +313,7 @@ server <- function(input, output, session) {
     plot(out_in_year[, 1], out_in_year[, "GS_inc"], type = "l",
          xlab = "Years", ylab = "Incidence",
          main = "Gametocyte Infections Sensitive/Resistant by Year",
-         xlim = c(2023, 2035), lwd = 2, col = 1,lty = 2,
+         xlim = c(input$time_x, 2035), lwd = 2, col = 1,lty = 2,
          ylim = c(0, 1.2 * max(out_in_year_baseline[1:35, "GR_inc"],out_in_year_baseline[1:35, "GS_inc"])))
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "GS_inc"], lty = 1, lwd = 2)
     lines(out_in_year[, 1], out_in_year[, "GR_inc"], lwd = 2,lty = 2, col = "red")
