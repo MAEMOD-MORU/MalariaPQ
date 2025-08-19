@@ -53,32 +53,69 @@ ui <- dashboardPage(
   dashboardHeader(title = "Malaria"),
   dashboardSidebar(
     sidebarMenu(
+      # Transmissibility group
+      actionButton("reset_all", "Reset", icon = icon("undo")),
       menuItem("Transmissibility", tabName = "transmissibility", icon = icon("bug"),
-               fluidRow(
-      sliderInput("Bss", "Beta of Symptomatic Sensitive (2000-2014)", min = 0, max = 10,step = 0.01,value = parameters$beta_s[1]),
-      sliderInput("Bas", "Beta of Asymptomatic Sensitive (2000-2014)", min = 0, max = 10,step = 0.01, value = parameters$beta_as),
-      sliderInput("Bss2", "Beta of Symptomatic Sensitive (2014-2035)", min = 0, max = 10,step = 0.01,value = parameters$beta_s_2[1]),
-      sliderInput("Bas2", "Beta of Asymptomatic Sensitive (2014-2035)", min = 0, max = 10,step = 0.01, value = parameters$beta_as_2),
-      sliderInput("Bsr", "Beta of Symptomatic Resistant", min = 0, max = 10,step = 0.01, value = parameters$beta_r[1]),
-      sliderInput("Bar", "Beta of Asymptomatic Resistant", min = 0, max = 10,step = 0.01, value =  parameters$beta_ar)
-               )
+               sliderInput("Bss", "Beta of Symptomatic Sensitive (2000-2014)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$beta_s[1]),
+               sliderInput("Bas", "Beta of Asymptomatic Sensitive (2000-2014)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$beta_as),
+               sliderInput("Bss2", "Beta of Symptomatic Sensitive (2014-2035)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$beta_s_2[1]),
+               sliderInput("Bas2", "Beta of Asymptomatic Sensitive (2014-2035)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$beta_as_2),
+               sliderInput("Bsr", "Beta of Symptomatic Resistant", 
+                           min = 0, max = 10, step = 0.01, value = parameters$beta_r[1]),
+               sliderInput("Bar", "Beta of Asymptomatic Resistant", 
+                           min = 0, max = 10, step = 0.01, value = parameters$beta_ar)
       ),
-      menuItem("res/sym", tabName = "drugs", icon = icon("bug"),
-      sliderInput("start_res","Number of res (%):",min = 0,max = 50,step = 1,value = parameters$prob_res*100),
-      sliderInput("prop_sym","proportion of symptomatic :",min = 0.01,max = 1,step = 0.01,value = (25/75))
+      # Symptomatic group
+      menuItem("Symptomatic", tabName = "symptomatic", icon = icon("user-md"),
+               sliderInput("prop_sym","Proportion symptomatic :", 
+                           min = 0.01, max = 1, step = 0.01, value = 25/75)
       ),
-      menuItem("Drugs", tabName = "drugs", icon = icon("bug"),
-               fluidRow(
-                sliderInput("D2_start","start of D2 (year) :",min = 2020,max = 2033,step = 1,value = 2025),
-                sliderInput("D0", "proportion of D0", min = 0, max = 1, value = 0.34, step = 0.01),
-                sliderInput("D1", "proportion of D1", min = 0, max = 1, value = 0.33, step = 0.01),
-                sliderInput("D2", "proportion of D2", min = 0, max = 1, value = 0.33, step = 0.01),
-               )
+      
+      # Resistance group
+      menuItem("Resistance", tabName = "resistance", icon = icon("dna"),
+               sliderInput("start_res","Number resistant (%) :", 
+                           min = 0, max = 50, step = 1, value = parameters$prob_res*100)
       ),
+      
+      # Gametocyte group
+      menuItem("Gametocyte", tabName = "gametocyte", icon = icon("tint"),
+
+               sliderInput("g_is", "Gametocyte (Symptomatic Sensitive)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$g_is[1]),
+               sliderInput("g_ir", "Gametocyte (Symptomatic Resistant)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$g_ir[1]),
+               sliderInput("g_as", "Gametocyte (Asymptomatic Sensitive)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$g_as[1]),
+               sliderInput("g_ar", "Gametocyte (Asymptomatic Resistant)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$g_ar[1]),
+               
+               sliderInput("g_infs", "Gametocyte (Sensitive, Not failed)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$g_infs[1]),
+               sliderInput("g_ifs", "Gametocyte (Sensitive, Failed)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$g_ifs[1]),
+               sliderInput("g_infr", "Gametocyte (Resistant, Not failed)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$g_infr[1]),
+               sliderInput("g_ifr", "Gametocyte (Resistant, Failed)", 
+                           min = 0, max = 10, step = 0.01, value = parameters$g_ifr[1])
+      ),
+      
+      # Treatment (Drugs) group
+      menuItem("Treatment", tabName = "treatment", icon = icon("pills"),
+               sliderInput("D2_start","Start of D2 (year) :", 
+                           min = 2020, max = 2033, step = 1, value = 2025),
+               sliderInput("D0", "Proportion of D0", min = 0, max = 1, value = 0.34, step = 0.01),
+               sliderInput("D1", "Proportion of D1", min = 0, max = 1, value = 0.33, step = 0.01),
+               sliderInput("D2", "Proportion of D2", min = 0, max = 1, value = 0.33, step = 0.01)
+      ),
+      
+      # Visualization group
       menuItem("Visualization", tabName = "visualization", icon = icon("chart-line"),
-               fluidRow(
-                 sliderInput("time_x","Time (years):",min = 2000,max = 2035,step = 1,value = 2014),
-               )
+               sliderInput("time_x","Time (years):", 
+                           min = 2000, max = 2035, step = 1, value = 2014)
       )
     )
   ),
@@ -101,6 +138,41 @@ server <- function(input, output, session) {
     out = NULL,
     parameters = parameters
   )
+  
+  observeEvent(input$reset_all, {
+    # Transmissibility
+    updateSliderInput(session, "Bss", value = parameters$beta_s[1])
+    updateSliderInput(session, "Bas", value = parameters$beta_as)
+    updateSliderInput(session, "Bss2", value = parameters$beta_s_2[1])
+    updateSliderInput(session, "Bas2", value = parameters$beta_as_2)
+    updateSliderInput(session, "Bsr", value = parameters$beta_r[1])
+    updateSliderInput(session, "Bar", value = parameters$beta_ar)
+    
+    # Symptomatic
+    updateSliderInput(session, "prop_sym", value = 25/75)
+    
+    # Resistance
+    updateSliderInput(session, "start_res", value = parameters$prob_res*100)
+    
+    # Gametocyte
+    updateSliderInput(session, "g_is", value = parameters$g_is[1])
+    updateSliderInput(session, "g_ir", value = parameters$g_ir[1])
+    updateSliderInput(session, "g_as", value = parameters$g_as[1])
+    updateSliderInput(session, "g_ar", value = parameters$g_ar[1])
+    updateSliderInput(session, "g_infs", value = parameters$g_infs[1])
+    updateSliderInput(session, "g_ifs", value = parameters$g_ifs[1])
+    updateSliderInput(session, "g_infr", value = parameters$g_infr[1])
+    updateSliderInput(session, "g_ifr", value = parameters$g_ifr[1])
+    
+    # Treatment
+    updateSliderInput(session, "D2_start", value = 2025)
+    updateSliderInput(session, "D0", value = 0.34)
+    updateSliderInput(session, "D1", value = 0.33)
+    updateSliderInput(session, "D2", value = 0.33)
+    
+    # Visualization
+    updateSliderInput(session, "time_x", value = 2014)
+  })
   
   last_mod <- reactiveVal(list(id = "D0", value = 0))
   observeEvent(input$D0, { last_mod(list(id = "D0", value = input$D0)) })
@@ -213,6 +285,36 @@ server <- function(input, output, session) {
   observeEvent(input$Bar, {
     values$parameters$beta_ar <- input$Bar
   })
+  
+  
+  
+  observeEvent(input$g_is, {
+    values$parameters$g_is <- input$g_is
+  })
+  observeEvent(input$g_ir, {
+    values$parameters$g_ir <- input$g_ir
+  })
+  observeEvent(input$g_as, {
+    values$parameters$g_as <- input$g_as
+  })
+  observeEvent(input$g_ar, {
+    values$parameters$g_ar <- input$g_ar
+  })
+  observeEvent(input$g_infs, {
+    values$parameters$g_infs <- input$g_infs
+  })
+  observeEvent(input$g_infr, {
+    values$parameters$g_infr <- input$g_infr
+  })
+  observeEvent(input$g_ifr, {
+    values$parameters$g_ifr <- input$g_ifr
+  })
+  observeEvent(input$g_ifs, {
+    values$parameters$g_ifs <- input$g_ifs
+  })
+  
+  
+  
   
   observeEvent(input$prop_sym, {
     values$parameters$prob_sym_s <- input$prop_sym
