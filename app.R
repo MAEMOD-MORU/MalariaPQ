@@ -78,7 +78,9 @@ ui <- dashboardPage(
       # Resistance group
       menuItem("Resistance", tabName = "resistance", icon = icon("dna"),
                sliderInput("start_res","Number resistant (%) :", 
-                           min = 0, max = 50, step = 1, value = parameters$prob_res*100)
+                           min = 0, max = 50, step = 1, value = parameters$prob_res*100),
+               sliderInput("fail_rate_r","Treatment failure ACT (%) :", 
+                           min = 0, max = 50, step = 1, value = parameters$Fail_rate_r*100)
       ),
       
       # Gametocyte group
@@ -107,6 +109,9 @@ ui <- dashboardPage(
       menuItem("Treatment", tabName = "treatment", icon = icon("pills"),
                sliderInput("D2_start","Start of D2 (year) :", 
                            min = 2020, max = 2033, step = 1, value = 2025),
+               sliderInput("D0_treatment","Gametocyte cleaning of D0 (Days)",min=10,max=120, value = 90, step = 0.01),
+               sliderInput("D1_treatment","Gametocyte cleaning of D1 (Days)",min=1,max=90, value = 44.1, step = 0.01),
+               sliderInput("D2_treatment","Gametocyte cleaning of D2 (Days)",min=0.1,max=60, value = 4.88, step = 0.01),
                sliderInput("D0", "Proportion of D0", min = 0, max = 1, value = 0.34, step = 0.01),
                sliderInput("D1", "Proportion of D1", min = 0, max = 1, value = 0.33, step = 0.01),
                sliderInput("D2", "Proportion of D2", min = 0, max = 1, value = 0.33, step = 0.01)
@@ -153,6 +158,7 @@ server <- function(input, output, session) {
     
     # Resistance
     updateSliderInput(session, "start_res", value = parameters$prob_res*100)
+    updateSliderInput(session, "fail_rate_r", value = parameters$Fail_rate_r*100)
     
     # Gametocyte
     updateSliderInput(session, "g_is", value = parameters$g_is[1])
@@ -166,6 +172,9 @@ server <- function(input, output, session) {
     
     # Treatment
     updateSliderInput(session, "D2_start", value = 2025)
+    updateSliderInput(session, "D0_treatment", value = 90)
+    updateSliderInput(session, "D1_treatment", value = 44.1)
+    updateSliderInput(session, "D2_treatment", value = 4.88)
     updateSliderInput(session, "D0", value = 0.34)
     updateSliderInput(session, "D1", value = 0.33)
     updateSliderInput(session, "D2", value = 0.33)
@@ -246,6 +255,18 @@ server <- function(input, output, session) {
     values$parameters$start_d <- 12 * year_d2
   })
   
+  observeEvent(input$D0_treatment, {
+    values$parameters$d0 <- (1/input$D0_treatment) * 30
+  })
+  
+  observeEvent(input$D1_treatment, {
+    values$parameters$d1 <- (1/input$D1_treatment) * 30
+  })
+  
+  observeEvent(input$D2_treatment, {
+    values$parameters$d2 <- (1/input$D2_treatment) * 30
+  })
+  
   observeEvent(input$start_res, {
     values$parameters$prob_res <- input$start_res / 100
     events <- list(
@@ -265,6 +286,9 @@ server <- function(input, output, session) {
       },
       time = 12 * 14
     )
+  })
+  observeEvent(input$fail_rate_r, {
+    values$parameters$Fail_rate_r <- input$fail_rate_r/100
   })
   
   observeEvent(input$Bss, {
