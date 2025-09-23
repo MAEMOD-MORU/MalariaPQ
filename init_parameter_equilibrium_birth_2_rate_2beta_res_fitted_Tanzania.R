@@ -1,16 +1,16 @@
 # Initial Population
-initP <- 24000150
+initP <- 52020962
 
 total_inc <- 1000
 
-prob_res <-0
+prob_sym_res <-0
 
 # Initial States from UI Inputs
-init_total_IAs <- total_inc*(1-prob_res)
-init_total_IAr <- total_inc*(prob_res)
+init_total_IAs <- total_inc*(1-prob_sym_res)
+init_total_IAr <- total_inc*(prob_sym_res)
 
-prob_sym_s = 0.25 # proportion of infection on sym sensitive group
-prob_sym_r = 0.25 # proportion of infection on sym resistance group
+prob_sym_s = 0.25 # Ratio of infection on sym/asym sensitive group
+prob_sym_r = 0.25 # Ratio of infection on sym/asym resistance group
 
 Is_total <- init_total_IAs * prob_sym_s
 As_total <- init_total_IAs * (1-prob_sym_s)
@@ -95,22 +95,22 @@ g_ifs = c(1.21,1.21)  #1
 g_infr = c(0.038,0.038)
 g_ifr = c(2.42,2.42) 
 
-beta_is = 5.075126       
-beta_as = 1.81449     
-beta_is_2 = 3.827039      
-beta_as_2 = 1.455645     
-beta_r = 2.909059     
-beta_ar = 1.052895     
+beta_is = 3.32272226343          
+beta_as = 1.24013417480       
+beta_is_2 = 2.02202699258        
+beta_as_2 = 1.03913437046       
+beta_r = 1.15974691407      
+beta_ar = 1.07756930942     
 
-mui <- 0.01681178 # Monthly mortality rate for birth
-muo <- 0.01400283 # Monthly mortality rate for death
-mui_before <- 0.01233062 # Monthly mortality rate for birth
-muo_before <- 0.01047908 # Monthly mortality rate for death
+mui <- 0.0184414970609   # Monthly mortality rate for birth
+muo <- 0.0170484994583   # Monthly mortality rate for death
+mui_before <- 0.0184414970609   # Monthly mortality rate for birth
+muo_before <- 0.0170484994583   # Monthly mortality rate for death
 
 # mui <- 0.01
 # muo <- 0.01
 
-parameters <- list(
+parameters_Tanzania <- list(
   mui = mui,
   muo = muo,
   mui_before = mui_before,
@@ -123,9 +123,9 @@ parameters <- list(
   phase = 0,
   prob_sym_s = prob_sym_s,
   prob_sym_r = prob_sym_r,
-  start_d = 6000,# 10 years after 3500 months
-  start_m = 12*15, # 2015
-  start_b = 12*14, # 2015
+  start_d = 10000,# 10 years after 3500 months
+  start_m = 10000, # 2015
+  start_b = 12*6, # 2015
   t_long = 12*100, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
   Fail_rate_r = 0.13,
@@ -168,7 +168,6 @@ parameters <- list(
   g_infr = g_infr,
   g_ifr = g_ifr,
   prob_res = 0.05,
-  start_res_year = 12*14
+  start_res_year =12*1
 )
 
-times <- seq(0, 12*36, 1) # 12 months per year, 36 years (2000-2035)

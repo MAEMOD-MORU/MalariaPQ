@@ -185,8 +185,8 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     Gasym_inc = sum(lam_as * GAs) + sum(lam_ar * GAr),
     N = N,
     sym = sum(Is) + sum(Ir) + sum(Stis) +sum(Stir) +sum(Fis) + sum(Fir) +sum(GIs) + sum(GIr),
-    asym = As+Ar+GAs+GAr
-    
+    asym = As+Ar+GAs+GAr,
+    inc_fail = Fail_rate_s  * Is[2:3] + Fail_rate_r  * Ir[2:3]
     
     )
   })

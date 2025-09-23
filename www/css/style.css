@@ -1,0 +1,29 @@
+body, p, h1, h2, h3, h4, h5, h6, span{
+ /*font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;*/
+  font-family: Inter, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+div.navbar-custom-menu{
+  float: left !important; 
+}
+.action-button.btn.btn-default.shiny-bound-input:hover{
+  /*#1387c0*/
+  background-color: #cfe7f2!important;
+}
+.action-button.btn.btn-default.shiny-bound-input:focus{
+  background-color: #296282!important;
+  color: #0b5173;
+}
+
+.btn-default{
+      background-color: #3c8dbc;
+}
+#reset_all{
+  background-color: whitesmoke;
+}
+.popover-content{
+  color:black;
+}
