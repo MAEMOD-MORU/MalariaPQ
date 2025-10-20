@@ -114,6 +114,33 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     lam_ir <- sum(season * (beta_r * GIr) / N)
     lam_ar <- sum(season * (beta_ar * GAr) / N)
     
+    # diagnostics to quantify treated-symptomatic share ----------
+    tiny <- 1e-12
+    
+    # Treated-symptomatic (T) = D1 + D2 gametocytes
+    # Sensitive treated channel contribution 
+    C_T_s <- season * (sum(beta_s[2:3] * GIs[2:3])) / N
+    
+    # Resistant treated channel contribution
+    C_T_r <- season * (sum(beta_r[2:3] * GIr[2:3])) / N
+    
+    # Untreated/asymptomatic (U) = D0 + asym carriers
+    # Sensitive untreated/asym
+    C_U_s <- season * (beta_as * GAs + beta_s[1] * GIs[1]) / N
+    
+    # Resistant untreated/asym
+    C_U_r <- season * (beta_ar * GAr + beta_r[1] * GIr[1]) / N
+    
+    # Channel totals (same scale as lam_* terms)
+    CT_total <- C_T_s + C_T_r
+    CU_total <- C_U_s + C_U_r
+    
+    # Fraction of transmission coming from treated symptomatic channel
+    F_T <- CT_total / (CT_total + CU_total + tiny)
+    
+    # Resistant fraction of incident infections (instantaneous)
+    p_resistant_inc <- (lam_ir + lam_ar) / (lam_is + lam_as + lam_ir + lam_ar + tiny)
+    
     # Rate of change for each state
     dS <- mui * N - muo * S - sum(lam_is * S) - sum(lam_as * S) - sum(lam_ir * S)  - sum(lam_ar * S)  + alpha * Rs + alpha * Rr
     
@@ -186,7 +213,14 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     N = N,
     sym = sum(Is) + sum(Ir) + sum(Stis) +sum(Stir) +sum(Fis) + sum(Fir) +sum(GIs) + sum(GIr),
     asym = As+Ar+GAs+GAr,
-    inc_fail = Fail_rate_s  * Is[2:3] + Fail_rate_r  * Ir[2:3]
+    inc_fail = Fail_rate_s  * Is[2:3] + Fail_rate_r  * Ir[2:3],
+    
+    # diagnostics 
+    F_T = F_T,                         # fraction of transmission from treated symptomatic (D1+D2)
+    CT_total = CT_total,               # treated channel contribution (for plotting)
+    CU_total = CU_total,               # untreated/asym channel contribution (for plotting)
+    p_resistant_inc = p_resistant_inc  # resistant share of incident infections
+    
     
     )
   })

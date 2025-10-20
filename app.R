@@ -62,7 +62,8 @@ ui <- dashboardPage(
   dashboardHeader(title = "MalariaPQ",
                   tags$li(actionLink("goto_intro", HTML("<b>Introduction</b>"), class = "btn btn-default"), class = "dropdown"),
                   tags$li(actionLink("goto_simulation", HTML("<b>Simulation</b>"), class = "btn btn-default"), class = "dropdown"),
-                  tags$li(actionLink("goto_about", HTML("<b>About us</b>"), class = "btn btn-default"), class = "dropdown")
+                  tags$li(actionLink("goto_about", HTML("<b>About us</b>"), class = "btn btn-default"), class = "dropdown"),
+                  tags$li(actionLink("goto_data", HTML("<b>Source Data</b>"), class = "btn btn-default"), class = "dropdown")
                   ),
   dashboardSidebar(
     sidebarMenu(
@@ -268,8 +269,14 @@ By comparing scenarios with different proportions of D0, D1, and D2, the app hig
     ),
     div(id="simulation",
     tabsetPanel(id="main",
-
-                tabPanel(title="Total Incidence",withSpinner(plotOutput("distPlot"))),
+                
+                tabPanel(title="Total Incidence",
+                         withSpinner(plotOutput("distPlot"))
+                         ),
+                tabPanel(title="Fraction of transmission & Resistant fraction",
+                         withSpinner(plotOutput("Plot_ft")),
+                         withSpinner(plotOutput("Plot_p_res")),
+                ),
                 tabPanel(title="Symptomatic/Asymptomatic Incidence",
                          withSpinner(plotOutput("Plot_sym_asym")),
                          withSpinner(plotOutput("Plot_sym_asym_ratio")),
@@ -285,7 +292,11 @@ By comparing scenarios with different proportions of D0, D1, and D2, the app hig
                 tabPanel(title="Gametocyte Infections (Sensitive vs Resistant)",
                          withSpinner( plotOutput("Plot_GS_GR")),
                          withSpinner(plotOutput("Plot_GS_GR_ratio"))
-                         )
+                         ),
+                tabPanel(title="Treated/untreated channel contribution",
+                         withSpinner( plotOutput("Plot_CT_total")),
+                         withSpinner(plotOutput("Plot_CU_total"))
+                )
                 ),
     ),
                 div(id="about_us",
@@ -303,7 +314,12 @@ By comparing scenarios with different proportions of D0, D1, and D2, the app hig
                     "Prof. Arjen Dondorp (email: ", tags$a(href="mailto:arjen@tropmedres.ac", "arjen@tropmedres.ac"),")",
                     br(),
                     "Dr. Thomas J Peto (email: ", tags$a(href="mailto:Tom@tropmedres.ac", "Tom@tropmedres.ac"),")",
-                    )
+                    ),
+    div(id="Data",
+        h3("Source Data"),
+        p("Below is the list of source data and their citations:"),
+        tableOutput("source_table")
+    ),
     
   )
 )
@@ -332,8 +348,8 @@ server <- function(session,input, output ) {
       updateSliderInput(session, "start_res_year", value = 2014)
       
       year_r <- input$start_res_year - 2000
-      points_time <- 2000:2022
-      obs <- uganda_Incidence[1:23, 2]
+      values$points_time <- 2000:2022
+      values$obs <- uganda_Incidence[1:23, 2]
       year_d2 <- input$D2_start - 1999
       values$parameters$start_d <- 12 * year_d2
 
@@ -414,24 +430,34 @@ server <- function(session,input, output ) {
     show("intro")
     hide("simulation")
     hide("about_us")
+    hide("Data")
   }, once = TRUE)
   
   observeEvent(input$goto_intro,{
     show("intro")
     hide("simulation")
     hide("about_us")
+    hide("Data")
   })
   
   observeEvent(input$goto_simulation, {
     hide("intro")
     show("simulation")
     hide("about_us")
+    hide("Data")
   })
   
   observeEvent(input$goto_about, {
     hide("intro")
     hide("simulation")
     show("about_us")
+    hide("Data")
+  })
+  observeEvent(input$goto_data, {
+    hide("intro")
+    hide("simulation")
+    hide("about_us")
+    show("Data")
   })
   
   observeEvent(input$reset_all, {
@@ -684,7 +710,30 @@ server <- function(session,input, output ) {
     values$parameters$beta_ar <- input$Bar
   })
   
+  # Data for Source Data tab
+  source_data <- data.frame(
+    Description = c(
+      "Rate of loss of immunity",
+      "Rate of recovery ACT & Primaquine 0.0625 mg/kg",
+      "Population of Uganda",
+      "Malaria Incidence of Uganda",
+      "Population of Tanzania",
+      "Malaria Incidence of Tanzania"
+    ),
+    Citation = c(
+      "DOI: 10.1371/journal.pone.0001767",
+      "DOI: 10.1002/cpt.2512",
+      "https://statisticstimes.com/demographics/country/uganda-population.php",
+      "https://data.worldbank.org/indicator/SH.MLR.INCD.P3?name_desc=true&locations=UG",
+      "https://statisticstimes.com/demographics/country/tanzania-population.php",
+      "https://www.who.int/teams/global-malaria-programme/reports/world-malaria-report-2024"
+    ),
+    stringsAsFactors = FALSE
+  )
   
+  output$source_table <- renderTable({
+    source_data
+  })
   
   observeEvent(input$g_is, {
     values$parameters$g_is <- c(input$g_is,input$g_is,input$g_is)
@@ -759,14 +808,14 @@ server <- function(session,input, output ) {
   output$distPlot <- renderPlot({
     out_in_year <- ode_results()
     out_in_year_baseline <- ode_baseline()
-
+    max_y <- max(out_in_year[1:20, "inc"],out_in_year_baseline[, "inc"])
 
     
     plot(out_in_year[, 1], out_in_year[, "inc"], type = "l",
          xlab = "Years", ylab = "Incidence",
          main = "Total Incidence by Year",
          xlim = c(input$time_x, 2035), lwd = 2, lty = 2,
-         col = 1, ylim = c(0, 1.2 * max(out_in_year[1:20, "inc"],out_in_year_baseline[, "inc"])))
+         col = 1, ylim = c(0, 1.2 * max_y))
     points(values$points_time, values$obs, col = "red", pch = 19)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc"], lwd = 2)
     abline(v = input$D2_start, lty = 2)
@@ -778,11 +827,15 @@ server <- function(session,input, output ) {
   output$Plot_sym_asym <- renderPlot({
     out_in_year <- ode_results()
     out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "inc_sym"], out_in_year[1:35, "inc_asym"],
+                   out_in_year_baseline[1:35, "inc_sym"], out_in_year_baseline[1:35, "inc_asym"]
+                   ))
+    
     plot(out_in_year[, 1], out_in_year[, "inc_sym"], type = "l",
          xlab = "Years", ylab = "Incidence",
          main = "Symptomatic/Asymptomatic Incidence by Year",
          xlim = c(input$time_x, 2035), lwd = 2, lty = 2,
-         col = "blue2", ylim = c(0, 1.2 * max(c(out_in_year[1:35, "inc_sym"], out_in_year[1:35, "inc_asym"]))))
+         col = "blue2", ylim = c(0, 1.2 * max_y))
     lines(out_in_year[, 1], out_in_year[, "inc_asym"], col = "green4", lty = 2, lwd = 2)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc_sym"], col = "blue2", lwd = 2)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc_asym"], col = "green4", lwd = 2)
@@ -795,7 +848,7 @@ server <- function(session,input, output ) {
   output$Plot_sym_asym_ratio <- renderPlot({
     out_in_year <- ode_results()
     out_in_year_baseline <- ode_baseline()
-    
+
     plot(out_in_year[, 1], out_in_year[, "inc_sym"]/out_in_year[, "inc"], type = "l",
          xlab = "Years", 
          ylab = "Proportion of incidence type",
@@ -814,11 +867,15 @@ server <- function(session,input, output ) {
   output$Plot_s_r <- renderPlot({
     out_in_year <- ode_results()
     out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "inc_s"], out_in_year[1:35, "inc_r"],
+                   out_in_year_baseline[1:35, "inc_s"], out_in_year_baseline[1:35, "inc_r"]
+                   ))
+    
     plot(out_in_year[, 1], out_in_year[, "inc_s"], type = "l",
          xlab = "Years", ylab = "Incidence",
          main = "Sensitive/Resistant Incidence by Year",
          xlim = c(input$time_x, 2035), lwd = 2, lty = 2,
-         col = "black", ylim = c(0, 1.2 * max(c(out_in_year[1:35, "inc_s"], out_in_year[1:35, "inc_r"]))))
+         col = "black", ylim = c(0, 1.2 * max_y))
     lines(out_in_year[, 1], out_in_year[, "inc_r"], col = "red", lty = 2, lwd = 2)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc_r"], col = "red", lwd = 2)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc_s"], lwd = 2)
@@ -849,6 +906,10 @@ server <- function(session,input, output ) {
   output$Plot_Gasym_sym <- renderPlot({
     out_in_year <- ode_results()
     out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "Gasym_inc"], out_in_year[1:35, "Gsym_inc"],
+                   out_in_year_baseline[1:35, "Gasym_inc"], out_in_year_baseline[1:35, "Gsym_inc"]
+    ))
+    
     plot(out_in_year[, 1], out_in_year[, "Gasym_inc"], type = "l",
          xlab = "Years", ylab = "Incidence",lty = 2,
          main = "Gametocyte Infections Asymptomatic/Symptomatic by Year",
@@ -883,11 +944,15 @@ server <- function(session,input, output ) {
   output$Plot_GS_GR <- renderPlot({
     out_in_year <- ode_results()
     out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "GR_inc"], out_in_year[1:35, "GR_inc"],
+                   out_in_year_baseline[1:35, "GR_inc"], out_in_year_baseline[1:35, "GR_inc"]
+    ))
+    
     plot(out_in_year[, 1], out_in_year[, "GS_inc"], type = "l",
          xlab = "Years", ylab = "Incidence",
          main = "Gametocyte Infections Sensitive/Resistant by Year",
          xlim = c(input$time_x, 2035), lwd = 2, col = 1,lty = 2,
-         ylim = c(0, 1.2 * max(out_in_year_baseline[1:35, "GR_inc"],out_in_year_baseline[1:35, "GS_inc"])))
+         ylim = c(0, 1.2 * max_y))
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "GS_inc"], lty = 1, lwd = 2)
     lines(out_in_year[, 1], out_in_year[, "GR_inc"], lwd = 2,lty = 2, col = "red")
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "GR_inc"], lwd = 2, col = "red")
@@ -912,6 +977,101 @@ server <- function(session,input, output ) {
     legend("left", c("Proportion Sensitive", "Proportion Resistant"), col = c(1, 2), lty = c(1, 1))
     text(input$D2_start - 1, 0.8, "Start D2")
     legend("right", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
+  })
+  
+  output$Plot_ft <- renderPlot({
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "F_T"]
+    ))
+    
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    plot(out_in_year[, 1], out_in_year[, "F_T"], type = "l",
+         xlab = "Years", ylab = "Proportion",
+         main = "FT",
+         xlim = c(input$time_x, 2035), lwd = 2, col = 1,lty = 2,
+         ylim = c(0, max_y*1.2))
+    lines(out_in_year_baseline[, 1], out_in_year_baseline[, "F_T"], lty = 1, lwd = 2)
+    abline(v = input$D2_start, lty = 2)
+    text(input$D2_start - 1, 0.8, "Start D2")
+    legend("left", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
+  })
+  
+  output$Plot_ft <- renderPlot({
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "F_T"]
+    ))
+    
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    plot(out_in_year[, 1], out_in_year[, "F_T"], type = "l",
+         xlab = "Years", ylab = "FT",
+         main = "FT",
+         xlim = c(input$time_x, 2035), lwd = 2, col = 1,lty = 2,
+         ylim = c(0, max_y*1.2))
+    lines(out_in_year_baseline[, 1], out_in_year_baseline[, "F_T"], lty = 1, lwd = 2)
+    abline(v = input$D2_start, lty = 2)
+    text(input$D2_start - 1, 0.8, "Start D2")
+    legend("bottomleft", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
+  })
+  
+  output$Plot_p_res <- renderPlot({
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "p_resistant_inc"]
+    ))
+    
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    plot(out_in_year[, 1], out_in_year[, "p_resistant_inc"], type = "l",
+         xlab = "Years", ylab = "Resistant Infection Fraction",
+         main = "Resistant fraction of incident infections",
+         xlim = c(input$time_x, 2035), lwd = 2, col = 1,lty = 2,
+         ylim = c(0, max_y*1.2))
+    lines(out_in_year_baseline[, 1], out_in_year_baseline[, "p_resistant_inc"], lty = 1, lwd = 2)
+    abline(v = input$D2_start, lty = 2)
+    text(input$D2_start - 1, 0.8, "Start D2")
+    legend("bottomleft", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
+  })
+  
+  output$Plot_CT_total <- renderPlot({
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "CT_total"],out_in_year_baseline[, "CT_total"]
+    ))
+    
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    plot(out_in_year[, 1], out_in_year[, "CT_total"], type = "l",
+         xlab = "Years", ylab = "Treated Contribution",
+         main = "CT_total",
+         xlim = c(input$time_x, 2035), lwd = 2, col = 1,lty = 2,
+         ylim = c(0, max_y*1.2))
+    lines(out_in_year_baseline[, 1], out_in_year_baseline[, "CT_total"], lty = 1, lwd = 2)
+    abline(v = input$D2_start, lty = 2)
+    text(input$D2_start - 1, 0.8, "Start D2")
+    legend("bottomleft", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
+  })
+  
+  output$Plot_CU_total <- renderPlot({
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    max_y <- max(c(out_in_year[1:35, "CU_total"],out_in_year_baseline[, "CU_total"]
+    ))
+    
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    plot(out_in_year[, 1], out_in_year[, "CU_total"], type = "l",
+         xlab = "Years", ylab = "Untreated Contribution",
+         main = "CU_total",
+         xlim = c(input$time_x, 2035), lwd = 2, col = 1,lty = 2,
+         ylim = c(0, max_y*1.2))
+    lines(out_in_year_baseline[, 1], out_in_year_baseline[, "CU_total"], lty = 1, lwd = 2)
+    abline(v = input$D2_start, lty = 2)
+    text(input$D2_start - 1, 0.8, "Start D2")
+    legend("bottomleft", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
   })
 
 }
