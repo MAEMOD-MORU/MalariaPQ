@@ -46,7 +46,11 @@ summarise_by_year <- function(out, vars_all, n_years, start_year = 2000) {
       if (v %in% colnames(out)) {
         if (v == "N") {
           out_in_year[i, v] <- out[end_idx, v]
-        } else {
+        }
+        else if(v == "p_resistant_inc" | v == "F_T" | v == "CT_total" | v == "CU_total"){
+          out_in_year[i, v] <- mean(out[start_idx:end_idx, v], na.rm = TRUE)
+        }
+        else {
           out_in_year[i, v] <- sum(out[start_idx:end_idx, v], na.rm = TRUE)
         }
       } else {
@@ -117,6 +121,10 @@ ui <- dashboardPage(
                                        min = 0, max = 10, step = 0.01, value = parameters$beta_r[1]),
                            sliderInput("Bar", "β (Asymptomatic)", 
                                        min = 0, max = 10, step = 0.01, value = parameters$beta_ar)
+               ),
+               menuItem("Treatment-associated",tabName = "Treatment_associated",
+                        sliderInput("s_hat","s_hat", 
+                                    min = 0.001, max = 4, step = 0.001, value = 0.35)
                )
       ),
       
@@ -183,6 +191,7 @@ ui <- dashboardPage(
                sliderInput("fail_rate_r","Resistant ACT Treatment Failure (%)", 
                            min = 0, max = 50, step = 0.1, value = parameters$Fail_rate_r*100)
                )
+
       ),
       
       # Visualization group
@@ -275,26 +284,45 @@ By comparing scenarios with different proportions of D0, D1, and D2, the app hig
                          ),
                 tabPanel(title="Fraction of transmission & Resistant fraction",
                          withSpinner(plotOutput("Plot_ft")),
+                         br(),
+                         withSpinner(verbatimTextOutput("kT_star_text")),
+                         hr(),
+                         br(),
                          withSpinner(plotOutput("Plot_p_res")),
                 ),
                 tabPanel(title="Symptomatic/Asymptomatic Incidence",
                          withSpinner(plotOutput("Plot_sym_asym")),
+                         br(),
+                         hr(),
+                         br(),
                          withSpinner(plotOutput("Plot_sym_asym_ratio")),
                          ),
                 tabPanel(title="Sensitive/Resistant Incidence",
                          withSpinner(plotOutput("Plot_s_r")),
+                         br(),
+                         hr(),
+                         br(),
                          withSpinner(plotOutput("Plot_s_r_ratio"))
                          ),
                 tabPanel(title="Gametocyte Infections (Symptomatic vs Asymptomatic)",
                          withSpinner(plotOutput("Plot_Gasym_sym")),
+                         br(),
+                         hr(),
+                         br(),
                          withSpinner(plotOutput("Plot_Gasym_sym_ratio"))
                          ),
                 tabPanel(title="Gametocyte Infections (Sensitive vs Resistant)",
                          withSpinner( plotOutput("Plot_GS_GR")),
+                         br(),
+                         hr(),
+                         br(),
                          withSpinner(plotOutput("Plot_GS_GR_ratio"))
                          ),
                 tabPanel(title="Treated/untreated channel contribution",
                          withSpinner( plotOutput("Plot_CT_total")),
+                         br(),
+                         hr(),
+                         br(),
                          withSpinner(plotOutput("Plot_CU_total"))
                 )
                 ),
@@ -1014,7 +1042,7 @@ server <- function(session,input, output ) {
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "F_T"], lty = 1, lwd = 2)
     abline(v = input$D2_start, lty = 2)
     text(input$D2_start - 1, 0.8, "Start D2")
-    legend("bottomleft", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
+    legend("left", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
   })
   
   output$Plot_p_res <- renderPlot({
@@ -1023,17 +1051,18 @@ server <- function(session,input, output ) {
     max_y <- max(c(out_in_year[1:35, "p_resistant_inc"]
     ))
     
+    
     out_in_year <- ode_results()
     out_in_year_baseline <- ode_baseline()
     plot(out_in_year[, 1], out_in_year[, "p_resistant_inc"], type = "l",
          xlab = "Years", ylab = "Resistant Infection Fraction",
          main = "Resistant fraction of incident infections",
          xlim = c(input$time_x, 2035), lwd = 2, col = 1,lty = 2,
-         ylim = c(0, max_y*1.2))
+         ylim = c(0, 1))
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "p_resistant_inc"], lty = 1, lwd = 2)
     abline(v = input$D2_start, lty = 2)
     text(input$D2_start - 1, 0.8, "Start D2")
-    legend("bottomleft", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
+    legend("left", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
   })
   
   output$Plot_CT_total <- renderPlot({
@@ -1072,6 +1101,16 @@ server <- function(session,input, output ) {
     abline(v = input$D2_start, lty = 2)
     text(input$D2_start - 1, 0.8, "Start D2")
     legend("bottomleft", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
+  })
+  
+  output$kT_star_text <- renderText({
+    out_in_year <- ode_results()
+    keep <- out_in_year[, "F_T"] 
+    FT_mean <- mean(keep, na.rm = TRUE)
+
+    # implied treated-channel advantage
+    kT_star <- 1 + input$s_hat / FT_mean
+    paste("Treatment-associated transmission advantage:", round(kT_star, 2))
   })
 
 }
