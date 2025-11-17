@@ -2,9 +2,9 @@
 library(deSolve)
 library(manipulate)
 #Read model
-source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets.R")
+source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
 
-source("init_parameter_after_1st_run_2015_D1_33.R")
+source("init_parameter_after_1st_run_2015_D1_33_SS.R")
 
 Tanzania_data <- read.csv("data/Reported malaria cases by method of confirmation.csv")
 Tanzania_Incidence <- Tanzania_data[6:14,c(1,4)]
@@ -71,6 +71,10 @@ manipulate(
     parameters_manipulate$beta_r <- m*rep(beta_s, 3)  # assuming same for all Is subgroups
     parameters_manipulate$beta_ar <- m*beta_as  # assuming same as beta_s0
     
+    parameters_manipulate$c_beta_r <- c_beta_r 
+    parameters_manipulate$prob_sym_s <- sym_ratio
+    parameters_manipulate$prob_sym_r <- sym_ratio
+    
     events <- list(
       func = function(time, state, parameters) {
         if (time == (12 * time_start_res_after)+1 ) {
@@ -122,15 +126,17 @@ manipulate(
     plot(2000:2050,ratio_2015_2023, type = "l", col = "red", xlab = "Year", ylab = "ratio",
          xlim=c(year_plot,2050),main="Ratio Resistance Incedence/Total Incedence"
          )
-    points(Tanzania_k13_Allele_frequency,col=2,lwd=2,pch=3)
-    points(2025,0.4,col=2,lwd=2,pch=3)
+    points(c(2016:2022,2025),c(Tanzania_k13_Allele_frequency,0.4),col=2,lwd=2,pch=3)
+    #points(2025,0.4,col=2,lwd=2,pch=3)
 
   },
-  beta_s = slider(0,10,step=0.00001,initial =0.671),
-  beta_as = slider(0,10,step=0.00001,initial =5.992),
+  beta_s = slider(0,10,step=0.00001,initial =0.5),
+  beta_as = slider(0,10,step=0.00001,initial =5),
   m = slider(0.1,3,step=0.01,initial =1.05),
   i = slider(0.00001,2,step=0.00001,initial =0.092),
+  sym_ratio = slider(0.01,1, step = 0.01, initial = 0.25),
   year_plot = slider(2000,2035,step=1,initial =2000),
-  time_start_res_after = slider(0,25,step=1,initial =16)
+  time_start_res_after = slider(0,25,step=1,initial =0),
+  c_beta_r = slider(0.01,2, step = 0.001, initial = 0.745)
 )
 

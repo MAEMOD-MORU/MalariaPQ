@@ -35,7 +35,7 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     gamma_ifs <- g_ifs 
     gamma_infr <- g_infr 
     gamma_ifr <- g_ifr  
-    
+
     if(t >= start_m){
       mui <- mui_before
       muo <- muo_before
@@ -124,9 +124,13 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     
     lam_is <- (season * (beta_s * GIs) / N)
     lam_as <- (season * (beta_as * GAs) / N)
-    lam_ir <- (season * (beta_r * GIr) / N)
-    lam_ar <- (season * (beta_ar * GAr) / N)
+    #lam_ir <- (season * (beta_r * GIr) / N)
+    #lam_ar <- (season * (beta_ar * GAr) / N)
     
+    lam_ir <- (season * (c_beta_r * beta_r * GIr) / N)
+    lam_ar <- (season * (c_beta_r * beta_ar * GAr) / N)
+    
+
     # diagnostics to quantify treated-symptomatic share ----------
     tiny <- 1e-12
     

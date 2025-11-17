@@ -9,8 +9,8 @@ prob_sym_res <-0
 init_total_IAs <- total_inc*(1-prob_sym_res)
 init_total_IAr <- total_inc*(prob_sym_res)
 
-prob_sym_s = 0.25 # Ratio of infection on sym/asym sensitive group
-prob_sym_r = 0.25 # Ratio of infection on sym/asym resistance group
+prob_sym_s = 0.5 # Ratio of infection on sym/asym sensitive group
+prob_sym_r = 0.5 # Ratio of infection on sym/asym resistance group
 
 Is_total <- init_total_IAs * prob_sym_s
 As_total <- init_total_IAs * (1-prob_sym_s)
@@ -109,6 +109,8 @@ muo_before <- 0.0165193099545    # Monthly mortality rate for death
 
 # mui <- 0.01
 # muo <- 0.01
+c_beta_r <- 0.7385   # resistant parasites transmit 20% less outside treatment
+
 
 parameters <- list(
   mui = mui,
@@ -168,7 +170,9 @@ parameters <- list(
   g_infs = g_infs,
   g_ifs = g_ifs,  #1
   g_infr = g_infr,
-  g_ifr = g_ifr
+  g_ifr = g_ifr,
+
+  c_beta_r = c_beta_r
 )
 
 times <- seq(0, 6000, by = 1)
