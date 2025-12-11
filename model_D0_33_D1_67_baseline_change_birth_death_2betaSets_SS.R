@@ -220,7 +220,7 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     inc_sym_r = (sum(lam_ir * S) +lam_ar * S)* (prob_sym_r),
     inc_asym = (sum(lam_is * S) +lam_as * S)* (1-prob_sym_s) + (sum(lam_ir * S) +lam_ar * S)* (1-prob_sym_r),
     inc_asym_s = (sum(lam_is * S) +lam_as * S)* (1-prob_sym_s),
-    inc_asym_r = (sum(lam_ir * S) +lam_ar * S)* (prob_sym_r),
+    inc_asym_r = (sum(lam_ir * S) +lam_ar * S)* (1-prob_sym_r),
 
     # Gametocyte Infections
     G_inc = sum(gamma_is * Is) + gamma_as * As + sum(gamma_ir * Ir) + gamma_ar * Ar,
