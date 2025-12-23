@@ -2,7 +2,7 @@
 ##### 2 #####
 Malaria_model_with_Array<- function(t, state, parameters) {
   with(as.list(c(state, parameters)), {
-
+    
     # Define variables
     Is <- c(Is0, Is1, Is2) # Recreate Is array from individual components
     Ir <- c(Ir0, Ir1, Ir2) # Recreate Ir array from individual components
@@ -35,7 +35,7 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     gamma_ifs <- g_ifs 
     gamma_infr <- g_infr 
     gamma_ifr <- g_ifr  
-
+    
     if(t >= start_m){
       mui <- mui_before
       muo <- muo_before
@@ -63,11 +63,11 @@ Malaria_model_with_Array<- function(t, state, parameters) {
       tau_is <- c(d0, d1, d1)
       tau_nfs <- τnfs
       tau_fs <- τfs
-
+      
       tau_ir <- c(d0, d1, d1)
       tau_nfr <- τnfr
       tau_fr <- τfr
-
+      
     }else if(t <=(start_d+t_long)){
       
       # print(T)
@@ -116,21 +116,16 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     N <- S + sum(Is) + sum(GIs) + sum(Stis) + sum(Fis) + GAs + As + Rs + sum(Ir) + sum(GIr) + sum(Stir) + sum(Fir) + GAr + Ar + Rr
     season <- flo + amp * sin(2 * pi / period * (phase + t))
     
-    # Compute lambda
-    # lam_is <- sum(season * (beta_s * GIs) / N)
-    # lam_as <- sum(season * (beta_as * GAs) / N)
-    # lam_ir <- sum(season * (beta_r * GIr) / N)
-    # lam_ar <- sum(season * (beta_ar * GAr) / N)
     
     lam_is <- (season * (beta_s * GIs) / N)
     lam_as <- (season * (beta_as * GAs) / N)
-    #lam_ir <- (season * (beta_r * GIr) / N)
-    #lam_ar <- (season * (beta_ar * GAr) / N)
     
-    lam_ir <- (season * (c_beta_r * beta_r * GIr) / N)
+    # c_beta_r add on the non-treated resistant
+    # D0 and Asymptomatic
+    lam_ir <- (season * (c(c_beta_r,1,1) * beta_r * GIr) / N)
     lam_ar <- (season * (c_beta_r * beta_ar * GAr) / N)
     
-
+    
     # diagnostics to quantify treated-symptomatic share ----------
     tiny <- 1e-12
     
@@ -221,7 +216,7 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     inc_asym = (sum(lam_is * S) +lam_as * S)* (1-prob_sym_s) + (sum(lam_ir * S) +lam_ar * S)* (1-prob_sym_r),
     inc_asym_s = (sum(lam_is * S) +lam_as * S)* (1-prob_sym_s),
     inc_asym_r = (sum(lam_ir * S) +lam_ar * S)* (1-prob_sym_r),
-
+    
     # Gametocyte Infections
     G_inc = sum(gamma_is * Is) + gamma_as * As + sum(gamma_ir * Ir) + gamma_ar * Ar,
     GS_inc = sum(gamma_is * Is) + gamma_as * As,
@@ -241,6 +236,3 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     )
   })
 }
-
-
-
