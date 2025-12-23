@@ -36,14 +36,15 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     gamma_infr <- g_infr 
     gamma_ifr <- g_ifr  
     
-    if(t >= start_m){
-      mui <- mui_before
-      muo <- muo_before
-    }
-    if(t >= start_b){
-      beta_s <- beta_s_2
-      beta_as <- beta_as_2
-    }
+    # For uganda
+    # if(t >= start_m){
+    #   mui <- mui_before
+    #   muo <- muo_before
+    # }
+    # if(t >= start_b){
+    #   beta_s <- beta_s_2
+    #   beta_as <- beta_as_2
+    # }
     
     # Rate of gametocyte to recovery
     if(t <=start_d){

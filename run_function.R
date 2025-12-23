@@ -1,5 +1,5 @@
 source('function.R')
-
+Tanzania_Incidence <- read.csv("data/Tanzania_pop_2000_2100.csv")[,2]
 Tanzania_k13_Allele_frequency <- read.csv("data/Tanzania_K13_Allele_frequency.csv")[,2]
 
 out <- run_malariaPQ_ode(prob_sym_s = 0,prob_sym_r=0)

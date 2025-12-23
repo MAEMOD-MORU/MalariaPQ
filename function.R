@@ -10,8 +10,6 @@ run_malariaPQ_ode <-function(
              prob_sym_r = 0.25,
              mui = 0.0185585066037,
              muo = 0.0165193099545,
-             mui_before = 0.0185585066037,
-             muo_before = 0.0165193099545,
              flo = 0.9,
              amp = 0.1,
              period = 12,
@@ -21,9 +19,7 @@ run_malariaPQ_ode <-function(
              propIs_new = c(0.67, 0 ,0.33),
              propIr_new = c(0.67, 0 ,0.33),
              start_d = 6000,
-             start_m = 12*1000,
-             start_b = 12*1000,
-             t_long = 12*100,
+             t_long = 12*10,
              Fail_rate_s = 0.025,
              Fail_rate_r = 0.13,
              beta_s = c(0.671, 0.671, 0.671),
@@ -64,8 +60,11 @@ run_malariaPQ_ode <-function(
                Ar     = 0.000000e+00,
                Rr     = 0.000000e+00
              ),
+             # multiplicative factor for initial state (population)
              m_init = 0.092
              ,
+             # for adding initial resistant infections
+             # time point and function to modify state
              events = list(
                func = function(time, state, parameters) {
                  if (time ==  1) {
@@ -88,8 +87,6 @@ run_malariaPQ_ode <-function(
   parameters <- list(
     mui = mui,
     muo = muo,
-    mui_before = mui_before,
-    muo_before = muo_before,
     flo = flo,
     amp = amp,
     propIs=propIs,
@@ -100,9 +97,7 @@ run_malariaPQ_ode <-function(
     phase = phase,
     prob_sym_s = prob_sym_s,
     prob_sym_r = prob_sym_r,
-    start_d = start_d,# 10 years after 3500 months
-    start_m = start_m, # 2015
-    start_b = start_b, # 2015
+    start_d = start_d,# 10 years
     t_long = t_long, # 2,5,10 years 
     Fail_rate_s = Fail_rate_s, # Fail Treatment of ACT
     Fail_rate_r = Fail_rate_r,
@@ -175,27 +170,196 @@ prep_malaria_outputs <- function(out,
   # Helper: reshape a monthly vector into 12 x years
   to_12xY <- function(x) matrix(x[1:(12L*n_months)], nrow = 12L, byrow = FALSE)
   
+  # add all output form modeling into a list
+  # names(out)
+  # [1] "time"            "S"               "Is0"             "Is1"             "Is2"            
+  # [6] "Stis1"           "Stis2"           "Fis1"            "Fis2"            "GIs0"           
+  # [11] "GIs1"            "GIs2"            "GAs"             "As"              "Rs"             
+  # [16] "Ir0"             "Ir1"             "Ir2"             "Stir1"           "Stir2"          
+  # [21] "Fir1"            "Fir2"            "GIr0"            "GIr1"            "GIr2"           
+  # [26] "GAr"             "Ar"              "Rr"              "inc"             "inc_s"          
+  # [31] "inc_r"           "inc_sym"         "inc_sym_s"       "inc_sym_r"       "inc_asym"       
+  # [36] "inc_asym_s"      "inc_asym_r"      "G_inc"           "GS_inc"          "GR_inc"         
+  # [41] "Gsym_inc"        "Gsym_inc_s"      "Gsym_inc_r"      "Gasym_inc"       "Gasym_inc_s"    
+  # [46] "Gasym_inc_r"     "N"               "F_T"             "CT_total"        "CU_total"       
+  # [51] "p_resistant_inc"
+  
+  # Annual summaries
+  mat_S     <- to_12xY(out[,"S"])
+  S_total   <- colSums(mat_S)
+  
+  mat_Is0    <- to_12xY(out[,"Is0"])
+  Is0_total  <- colSums(mat_Is0)
+  
+  mat_Is1    <- to_12xY(out[,"Is1"])
+  Is1_total  <- colSums(mat_Is1)
+  
+  mat_Is2    <- to_12xY(out[,"Is2"])
+  Is2_total  <- colSums(mat_Is2)
+  
+  mat_Is    <- to_12xY(out[,"Is0"] + out[,"Is1"] + out[,"Is2"])
+  Is_total  <- colSums(mat_Is)
+  
+  matStis1    <- to_12xY(out[,"Stis1"])
+  Stis1_total  <- colSums(matStis1)
+  
+  matStis2    <- to_12xY(out[,"Stis2"])
+  Stis2_total  <- colSums(matStis2)
+  
+  matStis    <- to_12xY(out[,"Stis1"] + out[,"Stis2"])
+  Stis_total  <- colSums(matStis)
+  
+  matFis1    <- to_12xY(out[,"Fis1"])
+  Fis1_total  <- colSums(matFis1)
+  
+  matFis2    <- to_12xY(out[,"Fis2"])
+  Fis2_total  <- colSums(matFis2)
+  
+  matFis    <- to_12xY(out[,"Fis1"] + out[,"Fis2"])
+  Fis_total  <- colSums(matFis)
+  
+  mat_GIs0    <- to_12xY(out[,"GIs0"])
+  GIs0_total  <- colSums(mat_GIs0)
+  
+  mat_GIs1    <- to_12xY(out[,"GIs1"])
+  GIs1_total  <- colSums(mat_GIs1)
+  
+  mat_GIs2    <- to_12xY(out[,"GIs2"])
+  GIs2_total  <- colSums(mat_GIs2)
+  
+  mat_GIs    <- to_12xY(out[,"GIs0"] + out[,"GIs1"] + out[,"GIs2"])
+  GIs_total  <- colSums(mat_GIs)
+  
+  mat_GAs    <- to_12xY(out[,"GAs"])
+  GAs_total  <- colSums(mat_GAs)
+  
+  mat_As    <- to_12xY(out[,"As"])
+  As_total  <- colSums(mat_As)
+  
+  mat_Rs    <- to_12xY(out[,"Rs"])
+  Rs_total  <- colSums(mat_Rs)
+  
+  mat_Ir0    <- to_12xY(out[,"Ir0"])
+  Ir0_total  <- colSums(mat_Ir0)
+  
+  mat_Ir1    <- to_12xY(out[,"Ir1"])
+  Ir1_total  <- colSums(mat_Ir1)
+  
+  mat_Ir2    <- to_12xY(out[,"Ir2"])
+  Ir2_total  <- colSums(mat_Ir2)
+  
+  mat_Ir    <- to_12xY(out[,"Ir0"] + out[,"Ir1"] + out[,"Ir2"])
+  Ir_total  <- colSums(mat_Ir)
+  
+  mat_Stir1    <- to_12xY(out[,"Stir1"])
+  Stir1_total  <- colSums(mat_Stir1)
+  
+  mat_Stir2    <- to_12xY(out[,"Stir2"])
+  Stir2_total  <- colSums(mat_Stir2)
+  
+  mat_Stir    <- to_12xY(out[,"Stir1"] + out[,"Stir2"])
+  Stir_total  <- colSums(mat_Stir)
+  
+  mat_Fir1    <- to_12xY(out[,"Fir1"])
+  Fir1_total  <- colSums(mat_Fir1)
+  
+  mat_Fir2    <- to_12xY(out[,"Fir2"])
+  Fir2_total  <- colSums(mat_Fir2)
+  
+  mat_Fir    <- to_12xY(out[,"Fir1"] + out[,"Fir2"])
+  Fir_total  <- colSums(mat_Fir)
+  
+  mat_GIr0    <- to_12xY(out[,"GIr0"])
+  GIr0_total  <- colSums(mat_GIr0)
+  
+  mat_GIr1    <- to_12xY(out[,"GIr1"])
+  GIr1_total  <- colSums(mat_GIr1)
+  
+  mat_GIr2    <- to_12xY(out[,"GIr2"])
+  GIr2_total  <- colSums(mat_GIr2)
+  
+  mat_GIr    <- to_12xY(out[,"GIr0"] + out[,"GIr1"] + out[,"GIr2"])
+  GIr_total  <- colSums(mat_GIr)
+  
+  mat_GAr    <- to_12xY(out[,"GAr"])
+  GAr_total  <- colSums(mat_GAr)
+  
+  mat_Ar    <- to_12xY(out[,"Ar"])
+  Ar_total  <- colSums(mat_Ar)
+  
+  mat_Rr    <- to_12xY(out[,"Rr"])
+  Rr_total  <- colSums(mat_Rr)
+  
   # Annual totals/means
   mat_inc   <- to_12xY(out[,"inc"])
   inc_tot   <- colSums(mat_inc)
   
-  mat_incr  <- to_12xY(out[,"inc_r"])
-  inc_r_tot <- colSums(mat_incr)
+  mat_inc_s   <- to_12xY(out[,"inc_s"])
+  inc_s_tot   <- colSums(mat_inc_s)
   
-  mat_N     <- to_12xY(out[,"N"])
-  N_mean    <- colMeans(mat_N)
-  
-  mat_sym_r <- to_12xY(out[,"inc_sym_r"])
-  sym_r_tot <- colSums(mat_sym_r)
+  mat_inc_r  <- to_12xY(out[,"inc_r"])
+  inc_r_tot <- colSums(mat_inc_r)
   
   mat_sym   <- to_12xY(out[,"inc_sym"])
   sym_tot   <- colSums(mat_sym)
   
-  mat_asym_r <- to_12xY(out[,"inc_asym_r"])
-  asym_r_tot <- colSums(mat_asym_r)
+  mat_sym_s   <- to_12xY(out[,"inc_sym_s"])
+  sym_s_tot   <- colSums(mat_sym_s)
+  
+  mat_sym_r <- to_12xY(out[,"inc_sym_r"])
+  sym_r_tot <- colSums(mat_sym_r)
   
   mat_asym   <- to_12xY(out[,"inc_asym"])
   asym_tot   <- colSums(mat_asym)
+  
+  mat_asym_s   <- to_12xY(out[,"inc_asym_s"])
+  asym_s_tot   <- colSums(mat_asym_s)
+  
+  mat_asym_r <- to_12xY(out[,"inc_asym_r"])
+  asym_r_tot <- colSums(mat_asym_r)
+  
+  mat_g_inc   <- to_12xY(out[,"G_inc"])
+  g_inc_tot   <- colSums(mat_g_inc)
+  
+  mat_gs_inc   <- to_12xY(out[,"GS_inc"])
+  gs_inc_tot   <- colSums(mat_gs_inc)
+  
+  mat_gr_inc <- to_12xY(out[,"GR_inc"])
+  gr_inc_tot <- colSums(mat_gr_inc)
+  
+  mat_gsym_inc   <- to_12xY(out[,"Gsym_inc"])
+  gsym_inc_tot   <- colSums(mat_gsym_inc)
+  
+  mat_gsym_s_inc   <- to_12xY(out[,"Gsym_inc_s"])
+  gsym_s_inc_tot   <- colSums(mat_gsym_s_inc)
+  
+  mat_gsym_r_inc <- to_12xY(out[,"Gsym_inc_r"])
+  gsym_r_inc_tot <- colSums(mat_gsym_r_inc)
+  
+  mat_gasym_inc   <- to_12xY(out[,"Gasym_inc"])
+  gasym_inc_tot   <- colSums(mat_gasym_inc)
+  
+  mat_gasym_s_inc   <- to_12xY(out[,"Gasym_inc_s"])
+  gasym_s_inc_tot   <- colSums(mat_gasym_s_inc)
+  
+  mat_gasym_r_inc <- to_12xY(out[,"Gasym_inc_r"])
+  gasym_r_inc_tot <- colSums(mat_gasym_r_inc)
+  
+  mat_N     <- to_12xY(out[,"N"])
+  Total_N    <- colSums(mat_N)
+  
+  mat_f_T     <- to_12xY(out[,"F_T"])
+  f_T_mean    <- colMeans(mat_f_T)
+  
+  mat_cT_total     <- to_12xY(out[,"CT_total"])
+  cT_total_mean    <- colMeans(mat_cT_total)
+  
+  mat_cU_total     <- to_12xY(out[,"CU_total"])
+  cU_total_mean    <- colMeans(mat_cU_total)
+  
+  mat_p_resistant_inc     <- to_12xY(out[,"p_resistant_inc"])
+  p_resistant_inc_mean    <- colMeans(mat_p_resistant_inc)
+  
   
   years <- start_year:end_year
   tiny  <- 1e-12
@@ -207,16 +371,50 @@ prep_malaria_outputs <- function(out,
   ratio_asym_r_tot <- asym_r_tot / (inc_tot + tiny)
   ratio_asym_r_asym <- asym_r_tot / (asym_tot + tiny)
   
+
+  
   list(
     years = years,
     annual = list(
-      inc_total = inc_tot,
+      S          = S_total,
+      Is         = Is_total,
+      Stis       = Stis_total,
+      Fis        = Fis_total,
+      GIs        = GIs_total,
+      GAs        = GAs_total,
+      As         = As_total,
+      Rs         = Rs_total,
+      Ir         = Ir_total,
+      Stir       = Stir_total,
+      Fir        = Fir_total,
+      GIr        = GIr_total,
+      GAr        = GAr_total,
+      Ar         = Ar_total,
+      Rr         = Rr_total,
+      Total_people = Total_N,
+      inc       = inc_tot,
       inc_r     = inc_r_tot,
-      N_mean    = N_mean,
+      inc_s     = inc_s_tot,
       inc_sym   = sym_tot,
+      inc_sym_s = sym_s_tot,
       inc_sym_r = sym_r_tot,
-      inc_asym  = asym_tot,
-      inc_asym_r= asym_r_tot
+      inc_asym   = asym_tot,
+      inc_asym_s = asym_s_tot,
+      inc_asym_r = asym_r_tot,
+      g_inc     = g_inc_tot,
+      gs_inc    = gs_inc_tot,
+      gr_inc    = gr_inc_tot,
+      gsym_inc  = gsym_inc_tot,
+      gsym_s_inc= gsym_s_inc_tot,
+      gsym_r_inc= gsym_r_inc_tot,
+      gasym_inc  = gasym_inc_tot,
+      gasym_s_inc= gasym_s_inc_tot,
+      gasym_r_inc= gasym_r_inc_tot,
+      F_T       = f_T_mean,
+      CT_total  = cT_total_mean,
+      CU_total  = cU_total_mean,
+      p_resistant_inc = p_resistant_inc_mean
+      
     ),
     ratio = list(
       r_over_total      = ratio_r_total,
@@ -265,7 +463,7 @@ plot_malaria_outputs <- function(prep,
          ylim=c(0, max(A$inc_total)*1.1))
     
     lines(years, A$inc_r, col="red")
-    lines(years, A$N_mean, col="green3")
+    lines(years, A$Total_people, col="green3")
     
     if (!is.null(Tanzania_Incidence)) {
       points(2015:2023, Tanzania_Incidence[,2], col="blue", lwd=2)
@@ -353,3 +551,4 @@ plot_malaria_outputs <- function(prep,
   invisible(prep)
 }
 
+# co
