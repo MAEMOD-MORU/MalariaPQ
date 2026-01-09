@@ -250,10 +250,10 @@ manipulate(
     initial = "High Transmission"
   ),
   
-  beta_s  = slider(0, 10, step = 0.00001, initial = 0.671),
-  beta_as = slider(0, 10, step = 0.00001, initial = 5.992),
+  beta_s  = slider(0, 10, step = 0.00001, initial = 1.5),
+  beta_as = slider(0, 10, step = 0.00001, initial = 1.5),
   m       = slider(0.1, 3, step = 0.01, initial = 1.05),
-  i       = slider(0.00001, 2, step = 0.00001, initial = 0.092),
+  i       = slider(0.00001, 2, step = 0.00001, initial = 0.36),
   c_beta_r = slider(0.01, 2, step = 0.001, initial = 0.745),
   year_plot = slider(2000, 2035, step = 1, initial = 2000),
   time_start_res_after = slider(0, 25, step = 1, initial = 0)

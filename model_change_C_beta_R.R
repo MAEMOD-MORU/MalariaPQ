@@ -121,17 +121,9 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     lam_is <- (season * (beta_s * GIs) / N)
     lam_as <- (season * (beta_as * GAs) / N)
     
-    # Applying the resistant fitness cost to only one 
-    # symptomatic class while leaving other symptomatic
-    # classes unaffected is not biologically justified,
-    # because the fitness cost reflects an intrinsic property
-    # of the parasite that influences mosquito infectivity
-    # regardless of the host’s clinical state or treatment
-    # pathway. If resistant parasites are less transmissible,
-    # this disadvantage should apply consistently across
-    # all sources of transmission (symptomatic and asymptomatic),
-    # rather than selectively to a single compartment.
-    lam_ir <- (season * (c_beta_r * beta_r * GIr) / N)
+    # c_beta_r add on the non-treated resistant
+    # D0 and Asymptomatic
+    lam_ir <- (season * (c(c_beta_r,1,1) * beta_r * GIr) / N)
     lam_ar <- (season * (c_beta_r * beta_ar * GAr) / N)
     
     

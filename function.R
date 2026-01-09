@@ -452,6 +452,15 @@ plot_malaria_outputs <- function(prep,
     }
   }
   
+  add_k13_points_2 <- function() {
+    if (!is.null(Tanzania_k13_Allele_frequency)) {
+      points(c(2016:2022, ref_year),
+             c(Tanzania_k13_Allele_frequency/2, ref_point),
+             col = 2, lwd = 2, pch = 3)
+      abline(v = ref_year, lty = 2)
+    }
+  }
+  
   if (plot_type == "Total Inc + Res") {
     par(mfrow = c(2, 1))
     
@@ -535,17 +544,20 @@ plot_malaria_outputs <- function(prep,
          type="l", col="red",
          xlab="Year", ylab="Ratio",
          main="Symptomatic Resistant Incidence / Symptomatic Incidence",
-         ylim=c(0,0.5),
+         ylim=c(0,1),
          xlim=c(year_plot, max(years)))
+    text(2027,0.4,round(R$sym_r_over_sym[26],2),pos=4)
     add_k13_points()
     
+    # k13_points/2
     plot(years, R$asym_r_over_asym,
          type="l", col="red",
          xlab="Year", ylab="Ratio",
          main="Asymptomatic Resistant Incidence / Asymptomatic Incidence",
-         ylim=c(0,0.5),
+         ylim=c(0,1),
          xlim=c(year_plot, max(years)))
-    add_k13_points()
+    add_k13_points_2()
+    text(2027,0.4,round(R$asym_r_over_asym[26],2),pos=4)
   }
   
   invisible(prep)

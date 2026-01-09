@@ -9,8 +9,8 @@ prob_sym_res <-0
 init_total_IAs <- total_inc*(1-prob_sym_res)
 init_total_IAr <- total_inc*(prob_sym_res)
 
-prob_sym_s = 0.5 # Ratio of infection on sym/asym sensitive group
-prob_sym_r = 0.5 # Ratio of infection on sym/asym resistance group
+prob_sym_s = 0.25 # Ratio of infection on sym/asym sensitive group
+prob_sym_r = 0.25 # Ratio of infection on sym/asym resistance group
 
 Is_total <- init_total_IAs * prob_sym_s
 As_total <- init_total_IAs * (1-prob_sym_s)
