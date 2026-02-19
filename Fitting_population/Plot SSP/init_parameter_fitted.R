@@ -1,5 +1,5 @@
 # Initial Population
-initP <- 52020962
+initP <- 34260139
 
 total_inc <- 1000
 
@@ -95,21 +95,21 @@ g_ifs = c(1.21,1.21)  #1
 g_infr = c(0.038,0.038)
 g_ifr = c(2.42,2.42) 
 
-beta_is = 0.671         
-beta_as = 5.992      
-beta_is_2 = 0.671       
-beta_as_2 = 5.992      
-beta_r = 0.067*1.05     
-beta_ar = 5.992*1.05       
+beta_is = 1.3898920          
+beta_as = 1.3898920       
+beta_is_2 = 1.3898920        
+beta_as_2 = 1.3898920       
+beta_r = 1.3898920 *1.042     
+beta_ar = 1.3898920 *1.042       
 
-mui <- 0.0185585066037    # Monthly mortality rate for birth
-muo <- 0.0165193099545    # Monthly mortality rate for death
-mui_before <- 0.0185585066037    # Monthly mortality rate for birth
-muo_before <- 0.0165193099545    # Monthly mortality rate for death
+mui <- 0.02261499    # Monthly mortality rate for birth
+muo <- 0.02037604    # Monthly mortality rate for death
+mui_before <- 0.02261499    # Monthly mortality rate for birth
+muo_before <- 0.02037604    # Monthly mortality rate for death
 
 # mui <- 0.01
 # muo <- 0.01
-c_beta_r <- 0.7385   # resistant parasites transmit 20% less outside treatment
+c_beta_r <- 0.7622   # resistant parasites transmit 20% less outside treatment
 
 
 parameters <- list(
