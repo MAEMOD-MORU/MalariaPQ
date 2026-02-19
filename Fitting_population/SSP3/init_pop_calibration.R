@@ -102,14 +102,14 @@ beta_as_2 = 1.0625
 beta_r = 1.0625*1.05     
 beta_ar = 1.0625*1.05       
 
-mui <- 0.02261499    # Monthly mortality rate for birth
-muo <- 0.02037604    # Monthly mortality rate for death
-mui_before <- 0.02261499    # Monthly mortality rate for birth
-muo_before <- 0.02037604    # Monthly mortality rate for death
+mui <- 0.01    # Monthly mortality rate for birth
+muo <- 0.01    # Monthly mortality rate for death
+mui_before <- 0.01    # Monthly mortality rate for birth
+muo_before <- 0.01    # Monthly mortality rate for death
 
 # mui <- 0.01
 # muo <- 0.01
-c_beta_r <- 0.7385   # resistant parasites transmit 20% less outside treatment
+c_beta_r <- 0.7385   # resistant parasites transmit
 
 
 parameters <- list(

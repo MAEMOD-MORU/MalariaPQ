@@ -102,10 +102,10 @@ beta_as_2 = 1.3898920
 beta_r = 1.3898920 *1.042     
 beta_ar = 1.3898920 *1.042       
 
-mui <- 0.02383766     # Monthly mortality rate for birth
-muo <- 0.02176775    # Monthly mortality rate for death
-mui_before <- 0.02383766     # Monthly mortality rate for birth
-muo_before <- 0.02176775m    # Monthly mortality rate for death
+mui <- 0.0227     # Monthly mortality rate for birth
+muo <- 0.0207    # Monthly mortality rate for death
+mui_before <- 0.0227     # Monthly mortality rate for birth
+muo_before <- 0.0207    # Monthly mortality rate for death
 
 # mui <- 0.01
 # muo <- 0.01

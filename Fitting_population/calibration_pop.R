@@ -18,14 +18,13 @@ times <- seq(0,12*51)
 pop_run <- function(pars,dat){
   parameters$mui <- pars[1]
   parameters$muo <- pars[2]
-  times
+
   out_model <- ode(y = state, times = times, func = Malaria_model_with_Array, parms = parameters)
   
   totalpop_model <- out_model[,"N"]
-  # totalpop_model <- colSums(pop_model)
-  #2013 - 2035 = 22 year
+
+  #2000 - 2050 = 51 years
   indx <- seq(1,12*51,12)
-  # print(totalpop_model[indx])
   print(rmsd(totalpop_model[indx]))
   rmsd(totalpop_model[indx]) 
 }
