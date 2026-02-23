@@ -65,17 +65,17 @@ out_ssp3_pop <- out_ssp3[,"N"]
 out_ssp3_inc <- colSums(matrix(out_ssp3[,"inc"],   nrow = 12))
 out_ssp3_ratio_inc_r <- colMeans(matrix(out_ssp3[,"inc_r"]/ out_ssp3[,"inc"], nrow = 12))
 
-year_m <- seq(0, 599/12, by = 1/12)+2000
+year_m <- seq(0, 611/12, by = 1/12)+2000
 year <- 2000:2050
 
 # Plot the results
-plot(year, out_ssp1_pop, type = "l", col = "blue",
+plot(year_m, out_ssp1_pop, type = "l", col = "blue",
      xlab = "Time (Year)", ylab = "Population", 
      main = "Total Population for Different SSPs",
      ylim = range(c(0,out_ssp1_pop, out_ssp2_pop, out_ssp3_pop)))
-lines(year, out_model_pop, col = "black",lwd=1)
-lines(year, out_ssp2_pop, col = "red")
-lines(year, out_ssp3_pop, col = "green3")
+lines(year_m, out_model_pop, col = "black",lwd=1)
+lines(year_m, out_ssp2_pop, col = "red")
+lines(year_m, out_ssp3_pop, col = "green3")
 points(2000:2050,totalpop_data, col = "black", pch = 16)
 points(ssp_year, data_ssp$SSP1, col = "blue", pch = 18)
 points(ssp_year, data_ssp$SSP2, col = "red", pch = 15)
