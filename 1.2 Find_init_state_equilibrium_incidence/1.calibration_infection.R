@@ -2,11 +2,11 @@
 library(deSolve)
 
 #Read model
-source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.r")
+source("../model/model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
 
 #
 source("init_parameter_calibration_infection.R")
-Tanzania_data <- read.csv("data/Reported malaria cases by method of confirmation.csv")
+Tanzania_data <- read.csv("../data/Reported malaria cases by method of confirmation.csv")
 Tanzania_Incidence <- Tanzania_data[6:14,c(1,4)]
 
 target_sym_asym <- rep((25/75),276) # Target incidence for symptomatic asymptomatic cases

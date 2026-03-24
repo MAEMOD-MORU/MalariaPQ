@@ -2,13 +2,15 @@
 library(deSolve)
 library(dplyr)
 
+#Read model
+source("../model/model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
+
+#
+source("init_parameter_calibration_infection.R")
+Tanzania_data <- read.csv("../data/Reported malaria cases by method of confirmation.csv")
+
 op<- readRDS("optimized_params_equilibrium.rds")
 init_state <- readRDS("init_state_2000.rds")
-
-source("init_parameter_calibration_infection.R")
-
-Tanzania_data <- read.csv("data/Reported malaria cases by method of confirmation.csv")
-Tanzania_Incidence <- Tanzania_data[6:14,c(1,4)]
 
 parameters_fitted <- parameters
 parameters_fitted$beta_s <- rep(op$par[1],3)
