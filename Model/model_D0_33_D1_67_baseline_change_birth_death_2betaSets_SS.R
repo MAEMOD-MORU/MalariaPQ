@@ -36,81 +36,20 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     gamma_infr <- g_infr 
     gamma_ifr <- g_ifr  
     
-    # For uganda
-    # if(t >= start_m){
-    #   mui <- mui_before
-    #   muo <- muo_before
-    # }
-    # if(t >= start_b){
-    #   beta_s <- beta_s_2
-    #   beta_as <- beta_as_2
-    # }
-    
-    # Rate of gametocyte to recovery
-    if(t <=start_d){
-      
-      gamma_is <- g_is
-      # D1 66%
-      gamma_infs <- c(g_infs[1],g_infs[1])
-      gamma_ifs <- c(g_ifs[1],g_ifs[1])
-      
-      gamma_ir <- g_ir
-      # D1 66%
-      gamma_infr <- c(g_infr[1],g_infr[1])
-      gamma_ifr <- c(g_ifr[1],g_ifr[1])
-      
-      
-      
-      tau_is <- c(d0, d1, d1)
-      tau_nfs <- τnfs
-      tau_fs <- τfs
-      
-      tau_ir <- c(d0, d1, d1)
-      tau_nfr <- τnfr
-      tau_fr <- τfr
-      
-    }else if(t <=(start_d+t_long)){
-      
-      # print(T)
-      gamma_is <- g_is 
-      gamma_ir <- g_ir 
-      gamma_infs <- g_infs 
-      gamma_ifs <- g_ifs 
-      gamma_infr <- g_infr 
-      gamma_ifr <- g_ifr  
-      
-      tau_is <- c(d0, d1, d2)
-      tau_nfs[2] <- d2
-      tau_fs <- τfs
-      
-      tau_ir <- c(d0, d1, d2)
-      tau_nfr[2] <- d2
-      tau_fr <- τfr
-    }else{
-      
-      gamma_is <- g_is
-      gamma_infs <- c(g_infs[1],g_infs[1])
-      gamma_ifs <- c(g_ifs[1],g_ifs[1])
-      
-      gamma_ir <- g_ir
-      gamma_infr <- c(g_infr[1],g_infr[1])
-      gamma_ifr <- c(g_ifr[1],g_ifr[1])
-      
-      
-      
-      tau_is <- c(d0, d1, d1)
-      tau_nfs <- τnfs
-      tau_fs <- τfs
-      
-      tau_ir <- c(d0, d1, d1)
-      tau_nfr <- τnfr
-      tau_fr <- τfr
-      
+    if(t >= start_b){
+      beta_s <- beta_s_2
+      beta_as <- beta_as_2
+      beta_r <- beta_r_2
+      beta_ar <- beta_ar_2
     }
     
-    if (t >= start_d) { 
+    # Rate of gametocyte to recovery
+    if (t >= start_d & t <=(start_d+t_long)) { 
       propIs <- propIs_new
       propIr <- propIr_new
+    }else {
+      propIs <- propIs
+      propIr <- propIr
     }
     # print(tau_ir)
     

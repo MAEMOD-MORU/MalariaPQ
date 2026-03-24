@@ -2,11 +2,11 @@ library(deSolve)
 library(dplyr)
 
 source("init_pop_calibration.R")
-source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
+source("../model/model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
 ### population calibration #####
 # data population
-# 2001-2050
-totalpop_data <- read.csv("data/Tanzania_pop_2000_2100.csv", header = TRUE)[1:51,2]
+# 2000-2050
+totalpop_data <- read.csv("../data/Tanzania_pop_2000_2100.csv", header = TRUE)[1:51,2]
 #pop 2000
 rmsd <- function(totalpop_model){
   diff <- (totalpop_model - totalpop_data)^2
