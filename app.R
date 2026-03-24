@@ -8,31 +8,30 @@ library(bsplus)
 library(shinycssloaders)
 
 # Read model
-source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets.R")
-source("init_parameter_equilibrium_birth_2_rate_2beta_res_fitted.R")
-uganda_Incidence <- read.csv("data/uganda_Incidence.csv")
-init_state <- readRDS("init_state.rds")
-
+source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
+init_state <- readRDS("init_state_d1_33.rds")
 source("init_parameter_equilibrium_birth_2_rate_2beta_res_fitted_Tanzania.R")
 tanzania_Incidence <- read.csv("data/Tanzania_incidence.csv")
-init_state_tanzani <- readRDS("init_state_Tanzania.rds")
+tanzania_Population <- read.csv("data/Tanzania_pop_2000_2100.csv", header = TRUE)[1:51,2]
+init_state_tanzania <- readRDS("init_state_d1_33.rds")
+parameters <- parameters_Tanzania
 
 events <- list(
   func = function(time, state, parameters) {
-    if (time == 12 * 14) {
-      state["Ir0"] <- state["Ir0"] + state["Is0"] * parameters$prob_res
-      state["Ir1"] <- state["Ir1"] + state["Is1"] * parameters$prob_res
-      state["Ir2"] <- state["Ir2"] + state["Is2"] * parameters$prob_res
-      state["Ar"]  <- state["Ar"]  + state["As"]  * parameters$prob_res
+    if (time == 1) {
+      state["Is0"] <- state["Is0"] -1
+      state["Is1"] <- state["Is1"] -1
+      state["As"]  <- state["As"]  -1
       
-      state["Is0"] <- state["Is0"] *(1-parameters$prob_res)
-      state["Is1"] <- state["Is1"] *(1-parameters$prob_res)
-      state["Is2"] <- state["Is2"] *(1-parameters$prob_res)
-      state["As"]  <- state["As"]  *(1-parameters$prob_res)
+      state["Ir0"] <- state["Ir0"] + 1
+      state["Ir1"] <- state["Ir1"] + 1
+      state["Ar"]  <- state["Ar"]  + 1
+      
+
     }
     return(state)
   },
-  time = 12 * 14
+  time = 1
 )
 
 summarise_by_year <- function(out, vars_all, n_years, start_year = 2000) {
@@ -74,7 +73,7 @@ ui <- dashboardPage(
 
       # useShinyjs(),
       actionButton("reset_all", "Reset", icon = icon("undo")),
-      radioButtons("country" , "Data Country",choices =c("Uganda","Tanzania") ),
+      radioButtons("country" , "Data Country",choices =c("Tanzania") ),
       
       # Transmissibility group
       menuItem("Transmissibility", tabName = "transmissibility", icon = icon("bug"),
@@ -90,7 +89,7 @@ ui <- dashboardPage(
                         bsPopover(
                           id = "beta1",
                           title = NULL,
-                          content = "Uganda: β1 (2000–2014); Tanzania: β1 (2015–2020)",
+                          content = "Tanzania: β1 (2015–2020)",
                           placement = "right",
                           trigger = "hover"
                         ),
@@ -104,7 +103,7 @@ ui <- dashboardPage(
                         bsPopover(
                           id = "beta2",
                           title = NULL,
-                          content = "Uganda: β2 (2014–2035); Tanzania: β2 (2020–2035)",
+                          content = "Tanzania: β2 (2020–2035)",
                           placement = "right",
                           trigger = "hover"
                         ),
@@ -117,14 +116,10 @@ ui <- dashboardPage(
                         )
                ),
                menuItem("Resistant", tabName = "transmissibility_resistant",
-                           sliderInput("Bsr", "β (Symptomatic)", 
-                                       min = 0, max = 10, step = 0.01, value = parameters$beta_r[1]),
-                           sliderInput("Bar", "β (Asymptomatic)", 
-                                       min = 0, max = 10, step = 0.01, value = parameters$beta_ar)
-               ),
-               menuItem("Treatment-associated",tabName = "Treatment_associated",
-                        sliderInput("s_hat","s_hat", 
-                                    min = 0.001, max = 4, step = 0.001, value = 0.35)
+                           sliderInput("M_beta_resistant", "Multiplier Beta Resistant", 
+                                       min = 0, max = 3, step = 0.01, value = 1.131),
+                           sliderInput("C_beta_resistant", "Resistant Fitness Cost", 
+                                       min = 0, max = 1, step = 0.01, value = parameters$c_beta_r)
                )
       ),
       
@@ -137,9 +132,7 @@ ui <- dashboardPage(
       # Resistance group
       menuItem("Resistance", tabName = "resistance", icon = icon("dna"),
                sliderInput("start_res_year","Start Year of Resistance", 
-                           min = 2010, max = 2020, step = 1, value = 2014,sep = ""),
-               sliderInput("start_res","Initial Resistance (%)", 
-                           min = 0, max = 50, step = 1, value = parameters$prob_res*100)
+                           min = 2000, max = 2025, step = 1, value = 2000,sep = "")
       ),
       
       # Gametocyte group
@@ -170,7 +163,7 @@ ui <- dashboardPage(
       menuItem("Treatment", tabName = "treatment", icon = icon("pills"),
                menuItem("Start Time", tabName = "treatment_time",
                sliderInput("D2_start","Start Year of D2", 
-                           min = 2020, max = 2033, step = 1, value = 2025,sep = "")
+                           min = 2000, max = 2033, step = 1, value = 2025,sep = "")
                ),
                menuItem("Clearance Gametocyte Time", tabName = "treatment_clearance",
                sliderInput("D0_treatment","Clearance Time (D0) [days]",min=10,max=120, value = 90, step = 0.01),
@@ -197,7 +190,7 @@ ui <- dashboardPage(
       # Visualization group
       menuItem("Visualization", tabName = "visualization", icon = icon("chart-line"),
                sliderInput("time_x","X-axis Time Range (years)", 
-                           min = 2000, max = 2035, step = 1, value = 2014,sep = "")
+                           min = 2000, max = 2035, step = 1, value = 2000,sep = "")
       )
     )
   ),
@@ -279,8 +272,12 @@ By comparing scenarios with different proportions of D0, D1, and D2, the app hig
     div(id="simulation",
     tabsetPanel(id="main",
                 
-                tabPanel(title="Total Incidence",
-                         withSpinner(plotOutput("distPlot"))
+                tabPanel(title="Total Incidence & Total Population",
+                         withSpinner(plotOutput("distPlot")),
+                         br(),
+                         hr(),
+                         br(),
+                         withSpinner(plotOutput("Plot_Population"))
                          ),
                 tabPanel(title="Fraction of transmission & Resistant fraction",
                          withSpinner(plotOutput("Plot_ft")),
@@ -358,36 +355,24 @@ server <- function(session,input, output ) {
     out_in_year = NULL,
     out_in_year_baseline = NULL,
     init_state = init_state,
-    parameters = parameters,
+    parameters = parameters_Tanzania,
     times =times,
     events = events,
     points_time = 2000:2022,
-    obs = uganda_Incidence[1:23, 2]
+    obs = tanzania_Incidence[6:14,4]
   )
   
   
   observeEvent(input$country,{
     
 
-    if(input$country == "Uganda"){
-      
-      values$init_state <- init_state
-      values$parameters <- parameters
-      updateSliderInput(session, "start_res_year", value = 2014)
-      
-      year_r <- input$start_res_year - 2000
-      values$points_time <- 2000:2022
-      values$obs <- uganda_Incidence[1:23, 2]
-      year_d2 <- input$D2_start - 1999
-      values$parameters$start_d <- 12 * year_d2
+      if(input$country == "Tanzania"){
 
-    }else if(input$country == "Tanzania"){
-
-      values$init_state <- init_state_tanzani
+      values$init_state <- init_state_tanzania
       values$parameters <- parameters_Tanzania
-      updateSliderInput(session, "start_res_year", value = 2016)
+      updateSliderInput(session, "start_res_year", value = 2000)
       
-      year_r <- input$start_res_year - 2015
+      year_r <- input$start_res_year - 1999
       values$points_time <- 2015:2023
       values$obs <- tanzania_Incidence[6:14,4]
       year_d2 <- input$D2_start - 2014
@@ -400,33 +385,31 @@ server <- function(session,input, output ) {
     values$events <- list(
       func = function(time, state, parameters) {
         if (time == values$parameters$start_res_year) {
-          state["Ir0"] <- state["Ir0"] + state["Is0"] * input$start_res/100
-          state["Ir1"] <- state["Ir1"] + state["Is1"] * input$start_res/100
-          state["Ir2"] <- state["Ir2"] + state["Is2"] * input$start_res/100
-          state["Ar"]  <- state["Ar"]  + state["As"]  * input$start_res/100
+          state["Ir0"] <- state["Ir0"] + 1
+          state["Ir1"] <- state["Ir1"] + 1
+          state["Ar"]  <- state["Ar"]  + 1
           
-          state["Is0"] <- state["Is0"] *(1-input$start_res/100)
-          state["Is1"] <- state["Is1"] *(1-input$start_res/100)
-          state["Is2"] <- state["Is2"] *(1-input$start_res/100)
-          state["As"]  <- state["As"]  *(1-input$start_res/100)
+          state["Is0"] <- state["Is0"] -1
+          state["Is1"] <- state["Is1"] -1
+          state["As"]  <- state["As"]  -1
         }
         return(state)
       },
-      time = values$parameters$start_res_year
+      time = 1
     )
     # Transmissibility
     updateSliderInput(session, "Bss", value = values$parameters$beta_s[1])
     updateSliderInput(session, "Bas", value = values$parameters$beta_as)
     updateSliderInput(session, "Bss2", value = values$parameters$beta_s_2[1])
     updateSliderInput(session, "Bas2", value = values$parameters$beta_as_2)
-    updateSliderInput(session, "Bsr", value = values$parameters$beta_r[1])
-    updateSliderInput(session, "Bar", value = values$parameters$beta_ar)
-    
+    updateSliderInput(session, "M_beta_resistant", value = 1.131)
+    updateSliderInput(session, "C_beta_resistant", value = parameters$c_beta_r)
+
     # Symptomatic
     updateSliderInput(session, "prop_sym", value = 0.25)
     
     # Resistance
-    updateSliderInput(session, "start_res", value = values$parameters$prob_res*100)
+    # updateSliderInput(session, "start_res", value = values$parameters$prob_res*100)
     
     # Gametocyte
     updateSliderInput(session, "g_is", value = values$parameters$g_is[1])
@@ -443,14 +426,14 @@ server <- function(session,input, output ) {
     updateSliderInput(session, "D0_treatment", value = 90)
     updateSliderInput(session, "D1_treatment", value = 44.1)
     updateSliderInput(session, "D2_treatment", value = 4.88)
-    updateSliderInput(session, "D0", value = 33.34)
-    updateSliderInput(session, "D1", value = 33.33)
+    updateSliderInput(session, "D0", value = 66.67)
+    updateSliderInput(session, "D1", value = 0)
     updateSliderInput(session, "D2", value = 33.33)
     updateSliderInput(session, "fail_rate_s", value = values$parameters$Fail_rate_s*100)
     updateSliderInput(session, "fail_rate_r", value = values$parameters$Fail_rate_r*100)
     
     # Visualization
-    updateSliderInput(session, "time_x", value = 2014)
+    updateSliderInput(session, "time_x", value = 2000)
   })
 
   
@@ -489,60 +472,20 @@ server <- function(session,input, output ) {
   })
   
   observeEvent(input$reset_all, {
-    if(input$country == "Uganda"){
-    # Transmissibility
-    updateSliderInput(session, "Bss", value = parameters$beta_s[1])
-    updateSliderInput(session, "Bas", value = parameters$beta_as)
-    updateSliderInput(session, "Bss2", value = parameters$beta_s_2[1])
-    updateSliderInput(session, "Bas2", value = parameters$beta_as_2)
-    updateSliderInput(session, "Bsr", value = parameters$beta_r[1])
-    updateSliderInput(session, "Bar", value = parameters$beta_ar)
-    
-    # Symptomatic
-    updateSliderInput(session, "prop_sym", value = 0.25)
-    
-    # Resistance
-    updateSliderInput(session, "start_res_year", value = 2014)
-    updateSliderInput(session, "start_res", value = parameters$prob_res*100)
-    
-    # Gametocyte
-    updateSliderInput(session, "g_is", value = parameters$g_is[1])
-    updateSliderInput(session, "g_ir", value = parameters$g_ir[1])
-    updateSliderInput(session, "g_as", value = parameters$g_as[1])
-    updateSliderInput(session, "g_ar", value = parameters$g_ar[1])
-    updateSliderInput(session, "g_infs", value = parameters$g_infs[1])
-    updateSliderInput(session, "g_ifs", value = parameters$g_ifs[1])
-    updateSliderInput(session, "g_infr", value = parameters$g_infr[1])
-    updateSliderInput(session, "g_ifr", value = parameters$g_ifr[1])
-    
-    # Treatment
-    updateSliderInput(session, "D2_start", value = 2025)
-    updateSliderInput(session, "D0_treatment", value = 90)
-    updateSliderInput(session, "D1_treatment", value = 44.1)
-    updateSliderInput(session, "D2_treatment", value = 4.88)
-    updateSliderInput(session, "D0", value = 33.34)
-    updateSliderInput(session, "D1", value = 33.33)
-    updateSliderInput(session, "D2", value = 33.33)
-    updateSliderInput(session, "fail_rate_s", value = parameters$Fail_rate_s*100)
-    updateSliderInput(session, "fail_rate_r", value = parameters$Fail_rate_r*100)
-    
-    # Visualization
-    updateSliderInput(session, "time_x", value = 2014)
-    }else{
       # Transmissibility
       updateSliderInput(session, "Bss", value = parameters_Tanzania$beta_s[1])
       updateSliderInput(session, "Bas", value = parameters_Tanzania$beta_as)
       updateSliderInput(session, "Bss2", value = parameters_Tanzania$beta_s_2[1])
       updateSliderInput(session, "Bas2", value = parameters_Tanzania$beta_as_2)
-      updateSliderInput(session, "Bsr", value = parameters_Tanzania$beta_r[1])
-      updateSliderInput(session, "Bar", value = parameters_Tanzania$beta_ar)
+      updateSliderInput(session, "M_beta_resistant", value = 1.131)
+      updateSliderInput(session, "C_beta_resistant", value = parameters$c_beta_r)
       
       # Symptomatic
       updateSliderInput(session, "prop_sym", value = 0.25)
       
       # Resistance
-      updateSliderInput(session, "start_res_year", value = 2016)
-      updateSliderInput(session, "start_res", value = parameters_Tanzania$prob_res*100)
+      updateSliderInput(session, "start_res_year", value = 2000)
+      # updateSliderInput(session, "start_res", value = parameters_Tanzania$prob_res*100)
       
       # Gametocyte
       updateSliderInput(session, "g_is", value = parameters_Tanzania$g_is[1])
@@ -559,16 +502,14 @@ server <- function(session,input, output ) {
       updateSliderInput(session, "D0_treatment", value = 90)
       updateSliderInput(session, "D1_treatment", value = 44.1)
       updateSliderInput(session, "D2_treatment", value = 4.88)
-      updateSliderInput(session, "D0", value = 33.34)
-      updateSliderInput(session, "D1", value = 33.33)
+      updateSliderInput(session, "D0", value = 66.67)
+      updateSliderInput(session, "D1", value = 0)
       updateSliderInput(session, "D2", value = 33.33)
       updateSliderInput(session, "fail_rate_s", value = parameters_Tanzania$Fail_rate_s*100)
       updateSliderInput(session, "fail_rate_r", value = parameters_Tanzania$Fail_rate_r*100)
-      
+     
       # Visualization
-      updateSliderInput(session, "time_x", value = 2014)
-    }
-    
+      updateSliderInput(session, "time_x", value = 2000)
   })
   
   last_mod <- reactiveVal(list(id = "D0", value = 0))
@@ -634,19 +575,15 @@ server <- function(session,input, output ) {
       }
     }
     
-    values$parameters$propIs <- c(input$D0/100, input$D1/100, input$D2/100)
-    values$parameters$propIr <- c(input$D0/100, input$D1/100, input$D2/100)
+    values$parameters$propIs_new <- c(input$D0/100, input$D1/100, input$D2/100)
+    values$parameters$propIr_new <- c(input$D0/100, input$D1/100, input$D2/100)
   })
   
   observeEvent(input$D2_start, {
-    if(input$country == "Uganda"){
+
       year_d2 <- input$D2_start - 1999
       values$parameters$start_d <- 12 * year_d2
-    }
-    else{
-      year_d2 <- input$D2_start - 2014
-      values$parameters$start_d <- 12 * year_d2
-    }
+    
 
   })
   
@@ -664,26 +601,24 @@ server <- function(session,input, output ) {
   
   observeEvent(input$start_res_year, {
 
-    if(input$country == "Uganda"){
+    if(input$country == "Tanzania"){
       year_r <- input$start_res_year - 2000
-    }else if(input$country == "Tanzania"){
-      year_r <- input$start_res_year - 2015
     }
 
-    values$parameters$start_res_year <- 12 * year_r
+    values$parameters$start_res_year <- (12 * year_r) +1
 
     values$events <- list(
       func = function(time, state, parameters) {
         if (time == values$parameters$start_res_year) {
-          state["Ir0"] <- state["Ir0"] + state["Is0"] * input$start_res/100
-          state["Ir1"] <- state["Ir1"] + state["Is1"] * input$start_res/100
-          state["Ir2"] <- state["Ir2"] + state["Is2"] * input$start_res/100
-          state["Ar"]  <- state["Ar"]  + state["As"]  * input$start_res/100
+          state["Is0"] <- state["Is0"] -1
+          state["Is1"] <- state["Is1"] -1
+          state["As"]  <- state["As"]  -1
           
-          state["Is0"] <- state["Is0"] *(1-input$start_res/100)
-          state["Is1"] <- state["Is1"] *(1-input$start_res/100)
-          state["Is2"] <- state["Is2"] *(1-input$start_res/100)
-          state["As"]  <- state["As"]  *(1-input$start_res/100)
+          state["Ir0"] <- state["Ir0"] + 1
+          state["Ir1"] <- state["Ir1"] + 1
+          state["Ar"]  <- state["Ar"]  + 1
+          
+          
         }
         return(state)
       },
@@ -696,20 +631,20 @@ server <- function(session,input, output ) {
 
     values$events <- list(
       func = function(time, state, parameters) {
-        if (time == values$parameters$start_res_year) {
-          state["Ir0"] <- state["Ir0"] + state["Is0"] * input$start_res/100
-          state["Ir1"] <- state["Ir1"] + state["Is1"] * input$start_res/100
-          state["Ir2"] <- state["Ir2"] + state["Is2"] * input$start_res/100
-          state["Ar"]  <- state["Ar"]  + state["As"]  * input$start_res/100
+        if (time == 1) {
+          state["Is0"] <- state["Is0"] -1
+          state["Is1"] <- state["Is1"] -1
+          state["As"]  <- state["As"]  -1
           
-          state["Is0"] <- state["Is0"] *(1-input$start_res/100)
-          state["Is1"] <- state["Is1"] *(1-input$start_res/100)
-          state["Is2"] <- state["Is2"] *(1-input$start_res/100)
-          state["As"]  <- state["As"]  *(1-input$start_res/100)
+          state["Ir0"] <- state["Ir0"] + 1
+          state["Ir1"] <- state["Ir1"] + 1
+          state["Ar"]  <- state["Ar"]  + 1
+          
+          
         }
         return(state)
       },
-      time = values$parameters$start_res_year
+      time = 1
     )
   })
   observeEvent(input$fail_rate_s, {
@@ -731,11 +666,14 @@ server <- function(session,input, output ) {
   observeEvent(input$Bas2, {
     values$parameters$beta_as_2 <- input$Bas2
   })
-  observeEvent(input$Bsr, {
-    values$parameters$beta_r <- c(input$Bsr,input$Bsr,input$Bsr)
+  observeEvent(input$M_beta_resistant, {
+    values$parameters$beta_r <- c(input$Bss,input$Bss,input$Bss)*input$M_beta_resistant
+    values$parameters$beta_ar <- input$Bas*input$M_beta_resistant
+    values$parameters$beta_r_2 <- c(input$Bss2,input$Bss2,input$Bss2)*input$M_beta_resistant
+    values$parameters$beta_ar_2 <- input$Bas2*input$M_beta_resistant
   })
-  observeEvent(input$Bar, {
-    values$parameters$beta_ar <- input$Bar
+  observeEvent(input$C_beta_resistant, {
+    values$parameters$c_beta_r <- input$C_beta_resistant
   })
   
   # Data for Source Data tab
@@ -743,16 +681,12 @@ server <- function(session,input, output ) {
     Description = c(
       "Rate of loss of immunity",
       "Rate of recovery ACT & Primaquine 0.0625 mg/kg",
-      "Population of Uganda",
-      "Malaria Incidence of Uganda",
       "Population of Tanzania",
       "Malaria Incidence of Tanzania"
     ),
     Citation = c(
       "DOI: 10.1371/journal.pone.0001767",
       "DOI: 10.1002/cpt.2512",
-      "https://statisticstimes.com/demographics/country/uganda-population.php",
-      "https://data.worldbank.org/indicator/SH.MLR.INCD.P3?name_desc=true&locations=UG",
       "https://statisticstimes.com/demographics/country/tanzania-population.php",
       "https://www.who.int/teams/global-malaria-programme/reports/world-malaria-report-2024"
     ),
@@ -805,11 +739,7 @@ server <- function(session,input, output ) {
       events = values$events
     )
     vars_all <- colnames(out)
-    if(input$country == "Uganda"){
-      summarise_by_year(out, vars_all, 36)
-    }else{
-      summarise_by_year(out, vars_all, 36,start_year=2015)
-    }
+    summarise_by_year(out, vars_all, 36,start_year=2000)
 
   })
   
@@ -825,11 +755,8 @@ server <- function(session,input, output ) {
       events = values$events
     )
     vars_all <- colnames(out)
-    if(input$country == "Uganda"){
-      summarise_by_year(out, vars_all, 36)
-    }else{
-      summarise_by_year(out, vars_all, 36,start_year=2015)
-    }
+    summarise_by_year(out, vars_all, 36,start_year=2000)
+
     
   })
   
@@ -837,7 +764,6 @@ server <- function(session,input, output ) {
     out_in_year <- ode_results()
     out_in_year_baseline <- ode_baseline()
     max_y <- max(out_in_year[1:20, "inc"],out_in_year_baseline[, "inc"])
-
     
     plot(out_in_year[, 1], out_in_year[, "inc"], type = "l",
          xlab = "Years", ylab = "Incidence",
@@ -847,9 +773,23 @@ server <- function(session,input, output ) {
     points(values$points_time, values$obs, col = "red", pch = 19)
     lines(out_in_year_baseline[, 1], out_in_year_baseline[, "inc"], lwd = 2)
     abline(v = input$D2_start, lty = 2)
-    legend("right", c("Model", "Data"), col = c(1, 2), lty = c(1, NA), pch = c(NA, 19))
+    legend("topleft", c("Model", "Data"), col = c(1, 2), lty = c(1, NA), pch = c(NA, 19))
     legend("bottomright", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
     text(input$D2_start - 1, 2e07, "Start D2")
+  })
+  
+  output$Plot_Population <- renderPlot({
+    out_in_year <- ode_results()
+    out_in_year_baseline <- ode_baseline()
+    max_y <- max(out_in_year[1:20, "N"],out_in_year_baseline[, "N"])
+    
+    plot(out_in_year[, 1], out_in_year[, "N"], type = "l",
+         xlab = "Years", ylab = "Population",
+         main = "Total Population by Year",
+         xlim = c(input$time_x, 2035), lwd = 2, lty = 1,
+         col = "green2", ylim = c(0, 1.2 * max_y))
+    points(2000:2050, tanzania_Population, col = 1, pch = 19)
+    legend("right", c("Model", "Data"), col = c("green2", 1), lty = c(1, NA), pch = c(NA, 19))
   })
   
   output$Plot_sym_asym <- renderPlot({
@@ -1108,9 +1048,7 @@ server <- function(session,input, output ) {
     keep <- out_in_year[, "F_T"] 
     FT_mean <- mean(keep, na.rm = TRUE)
 
-    # implied treated-channel advantage
-    kT_star <- 1 + input$s_hat / FT_mean
-    paste("Treatment-associated transmission advantage:", round(kT_star, 2))
+    paste("Treatment-associated transmission advantage:", round(FT_mean, 2))
   })
 
 }

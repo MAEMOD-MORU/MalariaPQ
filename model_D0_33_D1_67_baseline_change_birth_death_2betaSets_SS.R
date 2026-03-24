@@ -2,6 +2,7 @@
 ##### 2 #####
 Malaria_model_with_Array<- function(t, state, parameters) {
   with(as.list(c(state, parameters)), {
+    
     # Define variables
     Is <- c(Is0, Is1, Is2) # Recreate Is array from individual components
     Ir <- c(Ir0, Ir1, Ir2) # Recreate Ir array from individual components
@@ -35,84 +36,48 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     gamma_infr <- g_infr 
     gamma_ifr <- g_ifr  
     
-    if(t >= start_m){
-      mui <- mui_before
-      muo <- muo_before
-    }
+    # For uganda
+    # if(t >= start_m){
+    #   mui <- mui_before
+    #   muo <- muo_before
+    # }
     if(t >= start_b){
       beta_s <- beta_s_2
       beta_as <- beta_as_2
+      beta_r <- beta_r_2
+      beta_ar <- beta_ar_2
     }
     
     # Rate of gametocyte to recovery
-    if(t <=start_d){
-      
-      gamma_is <- g_is
-      # D1 66%
-      gamma_infs <- c(g_infs[1],g_infs[1])
-      gamma_ifs <- c(g_ifs[1],g_ifs[1])
-      
-      gamma_ir <- g_ir
-      # D1 66%
-      gamma_infr <- c(g_infr[1],g_infr[1])
-      gamma_ifr <- c(g_ifr[1],g_ifr[1])
-      
-      
-      
-      tau_is <- c(d0, d1, d1)
-      tau_nfs <- c(d1, d1)
-      tau_fs <- c(d1, d1)
-
-      tau_ir <- c(d0, d1, d1)
-      tau_nfr <- c(d1, d1)
-      tau_fr <- c(d1, d1)
-
-    }else if(t <=(start_d+t_long)){
-      
-      # print(T)
-      gamma_is <- g_is 
-      gamma_ir <- g_ir 
-      gamma_infs <- g_infs 
-      gamma_ifs <- g_ifs 
-      gamma_infr <- g_infr 
-      gamma_ifr <- g_ifr  
-      
-      tau_is <- c(d0, d1, d2)
-      tau_nfs <- τnfs
-      tau_fs <- τfs
-      
-      tau_ir <- c(d0, d1, d2)
-      tau_nfr <- τnfr
-      tau_fr <- τfr
-    }else{
-      
-      gamma_is <- g_is
-      gamma_infs <- c(g_infs[1],g_infs[1])
-      gamma_ifs <- c(g_ifs[1],g_ifs[1])
-      
-      gamma_ir <- g_ir
-      gamma_infr <- c(g_infr[1],g_infr[1])
-      gamma_ifr <- c(g_ifr[1],g_ifr[1])
-      
-      
-      
-      tau_is <- c(d0, d1, d1)
-      tau_nfs <- c(d1, d1)
-      tau_fs <- c(d1, d1)
-      tau_ir <- c(d0, d1, d1)
-      tau_nfr <- c(d1, d1)
-      tau_fr <- c(d1, d1)
-      
+    if (t >= start_d & t <=(start_d+t_long)) { 
+      propIs <- propIs_new
+      propIr <- propIr_new
+    }else {
+      propIs <- propIs
+      propIr <- propIr
     }
+    # print(tau_ir)
     
     N <- S + sum(Is) + sum(GIs) + sum(Stis) + sum(Fis) + GAs + As + Rs + sum(Ir) + sum(GIr) + sum(Stir) + sum(Fir) + GAr + Ar + Rr
     season <- flo + amp * sin(2 * pi / period * (phase + t))
     
-    # Compute lambda
-    lam_is <- sum(season * (beta_s * GIs) / N)
-    lam_as <- sum(season * (beta_as * GAs) / N)
-    lam_ir <- sum(season * (beta_r * GIr) / N)
-    lam_ar <- sum(season * (beta_ar * GAr) / N)
+    
+    lam_is <- (season * (beta_s * GIs) / N)
+    lam_as <- (season * (beta_as * GAs) / N)
+    
+    # Applying the resistant fitness cost to only one 
+    # symptomatic class while leaving other symptomatic
+    # classes unaffected is not biologically justified,
+    # because the fitness cost reflects an intrinsic property
+    # of the parasite that influences mosquito infectivity
+    # regardless of the host’s clinical state or treatment
+    # pathway. If resistant parasites are less transmissible,
+    # this disadvantage should apply consistently across
+    # all sources of transmission (symptomatic and asymptomatic),
+    # rather than selectively to a single compartment.
+    lam_ir <- (season * (c_beta_r * beta_r * GIr) / N)
+    lam_ar <- (season * (c_beta_r * beta_ar * GAr) / N)
+    
     
     # diagnostics to quantify treated-symptomatic share ----------
     tiny <- 1e-12
@@ -139,18 +104,18 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     F_T <- CT_total / (CT_total + CU_total + tiny)
     
     # Resistant fraction of incident infections (instantaneous)
-    p_resistant_inc <- (lam_ir + lam_ar) / (lam_is + lam_as + lam_ir + lam_ar + tiny)
+    p_resistant_inc <- sum(lam_ir + lam_ar) / sum(lam_is + lam_as + lam_ir + lam_ar + tiny)
     
     # Rate of change for each state
-    dS <- mui * N - muo * S - sum(lam_is * S) - sum(lam_as * S) - sum(lam_ir * S)  - sum(lam_ar * S)  + alpha * Rs + alpha * Rr
-    
+    dS <- mui * N - muo * S - sum(lam_is * S) - (lam_as * S) - sum(lam_ir * S)  - (lam_ar * S)  + alpha * Rs + alpha * Rr
+    # print(sum(lam_is * S,(lam_as * S)) * (prob_sym_s) * propIs)
     dIs <- -muo * Is + sum(lam_is * S,(lam_as * S)) * (prob_sym_s) * propIs - Is * (gamma_is)
     dIs[1] <- dIs[1] - tau_ntsd0 * Is[1]
-    dIs[2:3] <- dIs[2:3] - (1) * Is[2:3] # move to STis and Fis (Succeed/Fail to Treatment)
-    
+    dIs[2:3] <- dIs[2:3] - (1)* Is[2:3] # move to STis and Fis (Succeed/Fail to Treatment)
+    # print(beta_s*Is)
     dStis <- -muo * Stis + (1-Fail_rate_s)* Is[2:3] - Stis * gamma_infs - Stis * tau_nfs
     dFis  <- -muo * Fis  + Fail_rate_s  * Is[2:3] - Fis * gamma_ifs - Fis * tau_fs
-    
+    # print(sum(tau_is * GIs ))
     dGIs <- -muo * GIs + gamma_is * Is  - tau_is * GIs # Add gametocyte rate for Is
     dGIs[2:3] <- dGIs[2:3]+ Stis * gamma_infs + Fis * gamma_ifs
     
@@ -198,33 +163,29 @@ Malaria_model_with_Array<- function(t, state, parameters) {
     inc = sum(lam_is * S) + sum(lam_as * S) + sum(lam_ir * S)  + sum(lam_ar * S) ,
     inc_s = sum(lam_is * S) + sum(lam_as * S) ,
     inc_r = sum(lam_ir * S)  + sum(lam_ar * S) ,
-    inc_sym = sum(lam_is * S) + sum(lam_ir * S),
-    inc_sym_s = sum(lam_is * S),
-    inc_sym_r = sum(lam_ir * S),
-    inc_asym = sum(lam_as * S) + sum(lam_ar * S),
-    inc_asym_s = sum(lam_as * S),
-    inc_asym_r = sum(lam_ar * S),
-    # Gametocyte Infections
-    G_inc = sum(lam_is * GIs) + sum(lam_as * GAs) + sum(lam_ir * GIr) + sum(lam_ar * GAr),
-    GS_inc = sum(lam_is * GIs) + sum(lam_as * GAs),
-    GR_inc = sum(lam_ir * GIr) + sum(lam_ar * GAr),
-    Gsym_inc = sum(lam_is * GIs) + sum(lam_ir * GIr),
-    Gasym_inc = sum(lam_as * GAs) + sum(lam_ar * GAr),
-    N = N,
-    sym = sum(Is) + sum(Ir) + sum(Stis) +sum(Stir) +sum(Fis) + sum(Fir) +sum(GIs) + sum(GIr),
-    asym = As+Ar+GAs+GAr,
-    inc_fail = Fail_rate_s  * Is[2:3] + Fail_rate_r  * Ir[2:3],
+    inc_sym = (sum(lam_is * S) +lam_as * S)* (prob_sym_s) + (sum(lam_ir * S) +lam_ar * S)* (prob_sym_r),
+    inc_sym_s = (sum(lam_is * S) +lam_as * S)* (prob_sym_s),
+    inc_sym_r = (sum(lam_ir * S) +lam_ar * S)* (prob_sym_r),
+    inc_asym = (sum(lam_is * S) +lam_as * S)* (1-prob_sym_s) + (sum(lam_ir * S) +lam_ar * S)* (1-prob_sym_r),
+    inc_asym_s = (sum(lam_is * S) +lam_as * S)* (1-prob_sym_s),
+    inc_asym_r = (sum(lam_ir * S) +lam_ar * S)* (1-prob_sym_r),
     
+    # Gametocyte Infections
+    G_inc = sum(gamma_is * Is) + gamma_as * As + sum(gamma_ir * Ir) + gamma_ar * Ar,
+    GS_inc = sum(gamma_is * Is) + gamma_as * As,
+    GR_inc = sum(gamma_ir * Ir) + gamma_ar * Ar,
+    Gsym_inc = sum(gamma_is * Is) + sum(gamma_ir * Ir),
+    Gsym_inc_s = sum(gamma_is * Is),
+    Gsym_inc_r = sum(gamma_ir * Ir),
+    Gasym_inc = gamma_as * As + gamma_ar * Ar,
+    Gasym_inc_s = gamma_as * As,
+    Gasym_inc_r = gamma_ar * Ar,
+    N = N,
     # diagnostics 
     F_T = F_T,                         # fraction of transmission from treated symptomatic (D1+D2)
     CT_total = CT_total,               # treated channel contribution (for plotting)
     CU_total = CU_total,               # untreated/asym channel contribution (for plotting)
     p_resistant_inc = p_resistant_inc  # resistant share of incident infections
-    
-    
     )
   })
 }
-
-
-

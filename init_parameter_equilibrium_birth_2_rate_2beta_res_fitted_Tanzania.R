@@ -1,5 +1,5 @@
 # Initial Population
-initP <- 52020962
+initP <- 34260139
 
 total_inc <- 1000
 
@@ -18,11 +18,11 @@ As_total <- init_total_IAs * (1-prob_sym_s)
 Ir_total <- init_total_IAr * prob_sym_r
 Ar_total <- init_total_IAr * (1-prob_sym_r)
 
-init_D1s <- 1/3
-init_D2s <- 1/3
+init_D1s <- 0.33
+init_D2s <- 0
 
-init_D1r <- 1/3
-init_D2r <- 1/3
+init_D1r <- 0.33
+init_D2r <- 0
 
 propIs <- c(1 - (init_D1s + init_D2s), init_D1s, init_D2s) # ratio of
 propIr <- c(1 - (init_D1r + init_D2r), init_D1r, init_D2r)
@@ -95,20 +95,24 @@ g_ifs = c(1.21,1.21)  #1
 g_infr = c(0.038,0.038)
 g_ifr = c(2.42,2.42) 
 
-beta_is = 3.32272226343          
-beta_as = 1.24013417480       
-beta_is_2 = 2.02202699258        
-beta_as_2 = 1.03913437046       
-beta_r = 1.15974691407      
-beta_ar = 1.07756930942     
+beta_is = 1.421
+beta_as = 1.421
+beta_is_2 = 1.165
+beta_as_2 = 1.165
+beta_r = 1.421 *1.131
+beta_ar = 1.421 *1.131 
+beta_ir_2 = 1.165 *1.131    
+beta_ar_2 = 1.165 *1.131
 
-mui <- 0.0184414970609   # Monthly mortality rate for birth
-muo <- 0.0170484994583   # Monthly mortality rate for death
-mui_before <- 0.0184414970609   # Monthly mortality rate for birth
-muo_before <- 0.0170484994583   # Monthly mortality rate for death
+mui <- 0.02261499    # Monthly mortality rate for birth
+muo <- 0.02037604    # Monthly mortality rate for death
+mui_before <- 0.02261499    # Monthly mortality rate for birth
+muo_before <- 0.02037604    # Monthly mortality rate for death
 
 # mui <- 0.01
 # muo <- 0.01
+c_beta_r <- 0.707   # resistant parasites transmit 20% less outside treatment
+
 
 parameters_Tanzania <- list(
   mui = mui,
@@ -119,16 +123,18 @@ parameters_Tanzania <- list(
   amp = 0.1,
   propIs=propIs,
   propIr=propIr,
+  propIs_new = c(0.67, 0 ,0.33),
+  propIr_new = c(0.67, 0 ,0.33),
   period = 12,
   phase = 0,
   prob_sym_s = prob_sym_s,
   prob_sym_r = prob_sym_r,
-  start_d = 10000,# 10 years after 3500 months
-  start_m = 10000, # 2015
-  start_b = 12*6, # 2015
+  start_d = 6000,# 10 years after 3500 months
+  start_m = 12*1000, # 2015
+  start_b = 12*21, # 2020
   t_long = 12*100, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
-  Fail_rate_r = 0.13,
+  Fail_rate_r = 0.025,
   
   beta_s = c(beta_is, beta_is, beta_is),
   beta_r = c(beta_r, beta_r,beta_r),
@@ -136,6 +142,8 @@ parameters_Tanzania <- list(
   beta_ar = beta_ar,
   beta_s_2 =  c(beta_is_2, beta_is_2, beta_is_2),
   beta_as_2 = beta_as_2,
+  beta_r_2 = c(beta_ir_2,beta_ir_2,beta_ir_2),
+  beta_ar_2 = beta_ar_2,
   
   alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
   τigs=τigs,
@@ -157,7 +165,7 @@ parameters_Tanzania <- list(
   
   d0 = (1 / 90) * 30, # no drugs
   d1 = (1 / 44.1) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row Placebo (DP), column microscopy
-  d2 = (1 / 4.88) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
+  d2 = (1 / 1) * 30, # Gametocyte recovery rate from Palang paper, table 2 at row 0.0625 mg/kg, column microscopy
   
   g_is = g_is, #0.1
   g_ir = g_ir,
@@ -167,7 +175,8 @@ parameters_Tanzania <- list(
   g_ifs = g_ifs,  #1
   g_infr = g_infr,
   g_ifr = g_ifr,
-  prob_res = 0.05,
-  start_res_year =12*1
+  
+  c_beta_r = c_beta_r
 )
 
+times <- seq(0, 600, by = 1)
