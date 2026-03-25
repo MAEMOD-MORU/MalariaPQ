@@ -61,7 +61,6 @@ summarise_by_year <- function(out, vars_all, n_years, start_year = 2000) {
 }
 
 ui <- dashboardPage(
-
   dashboardHeader(title = "MalariaPQ",
                   tags$li(actionLink("goto_intro", HTML("<b>Introduction</b>"), class = "btn btn-default"), class = "dropdown"),
                   tags$li(actionLink("goto_simulation", HTML("<b>Simulation</b>"), class = "btn btn-default"), class = "dropdown"),
@@ -73,7 +72,10 @@ ui <- dashboardPage(
 
       # useShinyjs(),
       actionButton("reset_all", "Reset", icon = icon("undo")),
-      radioButtons("country" , "Data Country",choices =c("Tanzania") ),
+      div(
+        style = "display:none;",
+      radioButtons("country" , "Data Country",choices =c("Tanzania") )
+      ),
       
       # Transmissibility group
       menuItem("Transmissibility", tabName = "transmissibility", icon = icon("bug"),
@@ -186,13 +188,15 @@ ui <- dashboardPage(
                )
 
       ),
-      
+      div(
+        style = "display:none;",
       # Visualization group
       menuItem("Visualization", tabName = "visualization", icon = icon("chart-line"),
                sliderInput("time_x","X-axis Time Range (years)", 
                            min = 2000, max = 2035, step = 1, value = 2000,sep = "")
-      )
+      ))
     )
+    
   ),
   
   dashboardBody(
@@ -204,24 +208,96 @@ ui <- dashboardPage(
         href = "css/style.css")
     ),
     div(id="intro",
-        h2("Model Overview"),
-        HTML("<p>We developed a deterministic compartmental model to capture the transmission dynamics of <em>Plasmodium falciparum</em> in a human population, with the goal of evaluating the potential impact of artemisinin-based combination therapy (ACT) and ACT combined with a single low-dose of primaquine (PQ) on gametocyte prevalence and resistance propagation. The model stratifies infections by clinical presentation (asymptomatic or symptomatic), treatment status (D0 = no treatment, D1 = ACT, D2 = ACT+PQ), and parasite phenotype (artemisinin-sensitive vs. artemisinin-resistant).</p>
+        h3("Model Overview"),
+        HTML("<p>We developed a deterministic compartmental model to capture the transmission dynamics of Plasmodium falciparum in a human population, with the goal of evaluating the potential impact of artemisinin-based combination therapy (ACT) and ACT combined with a single low-dose of primaquine (PQ) on gametocyte prevalence and resistance propagation. The model stratifies infections by clinical presentation (asymptomatic or symptomatic), treatment status (no treatment, ACT, or ACT+PQ), and parasite phenotype (artemisinin-sensitive vs. artemisinin-resistant).</p>
              
              <p>The model is structured using ordinary differential equations (ODEs) and incorporates gametocyte-producing compartments to explicitly represent the infectious reservoir that contributes to onward transmission. Seasonal variation in transmission is included to approximate vector abundance changes, though vector dynamics are not modelled explicitly.</p>
              
              "),
         
         
-          h3("Figure Model"),
-          
+          h3("Model Compartment Descriptions"),
+        tags$p(
+          "The model divides the human population into several compartments to capture the infection dynamics of ",
+          tags$i("Plasmodium falciparum"),
+          ", stratified by clinical status, treatment pathway, and parasite resistance phenotype."
+        ),
+        
+        tags$p(
+          "Susceptible individuals (S) represent the uninfected population at risk of acquiring malaria through exposure to infectious mosquito bites. ",
+          "Upon infection, individuals either develop asymptomatic or symptomatic infections, depending on their immune status and exposure history."
+        ),
+        
+        tags$p(
+          "Asymptomatic infections are represented by ",
+          tags$b("A" ,tags$sub("s")),
+          " and ",
+          tags$b("A" ,tags$sub("r"),),
+          ", which denote individuals infected with artemisinin-sensitive and artemisinin-resistant parasites, respectively. ",
+          "These individuals do not seek treatment but may still contribute to transmission by developing transmissible levels of gametocytes. ",
+          "Their corresponding gametocyte-producing compartments are ",
+          tags$b("GA" ,tags$sub("s"),),
+          " and ",
+          tags$b("GA" ,tags$sub("r"),),
+          "."
+        ),
+        
+        tags$p(
+          "Symptomatic infections are further stratified by treatment received and parasite resistance status. ",
+          "For artemisinin-sensitive strains, ",
+          tags$b("I" ,tags$sub("s0")), ", ",
+          tags$b("I" ,tags$sub("s1")), ", and ",
+          tags$b("I" ,tags$sub("s2")),
+          " represent individuals receiving no treatment (D0), ACT only (D1), and ACT plus low-dose primaquine (D2), respectively. ",
+          "Similarly, ",
+          tags$b("I" ,tags$sub("r0")), ", ",
+          tags$b("I", tags$sub("r1")), ", and ",
+          tags$b("I", tags$sub("r2")),
+          " represent symptomatic infections caused by resistant parasites under the same treatment categories."
+        ),
+        
+        tags$p(
+          "Each treatment pathway is followed by one of two possible outcomes: success or failure. ",
+          "Successful treatment outcomes are tracked in ",
+          tags$b("ST", tags$sub("s1")), ", ",
+          tags$b("ST", tags$sub("s2")), ", ",
+          tags$b("ST", tags$sub("r1")), ", and ",
+          tags$b("ST", tags$sub("r2")),
+          ", while treatment failures are recorded in ",
+          tags$b("F", tags$sub("s1")), ", ",
+          tags$b("F", tags$sub("s2")), ", ",
+          tags$b("F", tags$sub("r1")), ", and ",
+          tags$b("F", tags$sub("r2")), "."
+        ),
+        
+        tags$p(
+          "Gametocyte production from symptomatic infections is represented by ",
+          tags$b("GI", tags$sub("s0")), ", ",
+          tags$b("GI", tags$sub("s1")), ", and ",
+          tags$b("GI", tags$sub("s2")),
+          " for sensitive infections, and ",
+          tags$b("GI", tags$sub("r0")), ", ",
+          tags$b("GI", tags$sub("r1")), ", and ",
+          tags$b("GI", tags$sub("r2")),
+          " for resistant infections."
+        ),
+        
+        tags$p(
+          "Finally, individuals who clear infection either naturally or through treatment enter the recovered compartments: ",
+          tags$b("R", tags$sub("s")),
+          " for sensitive infections and ",
+          tags$b("R", tags$sub("r")),
+          " for resistant infections."
+        ),
+        
           # Figure 1
           tags$figure(
             img(src = "img/figure1.png", style = "max-width:100%;"),
-            tags$figcaption(
+            tags$figcaption(tags$b(
               "Figure 1. Compartmental model of ",
               tags$em("Plasmodium falciparum"),
-              " transmission incorporating treatment with ACT and low-dose primaquine. 
-      The diagram illustrates the model structure for artemisinin-sensitive strains. 
+              " transmission incorporating treatment with ACT and low-dose primaquine."),
+      "The diagram illustrates the model structure for artemisinin-sensitive strains. 
       The human population is divided into susceptible (S), asymptomatic (A), and symptomatic (I) compartments. 
       Symptomatic infections are stratified by treatment status: untreated (D0), treated with ACT alone (D1), 
       or treated with ACT plus low-dose primaquine (D2). Each infected class may produce gametocytes (G), which 
@@ -232,41 +308,338 @@ ui <- dashboardPage(
             )
           ),
           
-          br(), br(),
+          br(), 
+      h3("Transmission Dynamics"),
+      tags$p("Transmission in the model is governed by the force of infection arising from infectious gametocyte carriers in the human population. The total force of infection is decomposed into contributions from four sources: symptomatic and asymptomatic infections with artemisinin-sensitive parasites, and symptomatic and asymptomatic infections with artemisinin-resistant parasites."),
+      tags$p("Specifically, the force of infection components are defined as:"),
+      withMathJax(),
+      
+      HTML("$$season(t) = flo + amp \\sin\\left(\\frac{2\\pi}{period}(phase + t)\\right)$$"),
+      HTML("
+  $$\\begin{aligned}
+  \\lambda_{is} &= season(t) \\frac{\\beta_s \\left(\\sum_{i=0}^{2} GI_{s,i}\\right)}{N(t)}, 
+  &\\lambda_{as} &= season(t) \\frac{\\beta_{as} GA_s}{N(t)} \\\\
+  \\lambda_{ir} &= season(t) \\frac{\\beta_r c_{\\beta r} \\left(\\sum_{i=0}^{2} GI_{r,i}\\right)}{N(t)}, 
+  &\\lambda_{ar} &= season(t) \\frac{\\beta_{ar} c_{\\beta r} GA_r}{N(t)}
+  \\end{aligned}$$
+  "),
+      tags$p("where:"),
+      # Text + subscripts (NO MathJax)
+      tags$ul(
+        tags$li(
+          tags$b("GI", tags$sub("s,i")), " and ",
+          tags$b("GI", tags$sub("r,i")),
+          " denote gametocyte carriers originating from symptomatic infections under treatment pathway i ∈ {0,1,2}"
+        ),
+        tags$li(
+          tags$b("GA", tags$sub("s")), " and ",
+          tags$b("GA", tags$sub("r")),
+          " denote gametocyte carriers from asymptomatic infections"
+        ),
+        tags$li(
+          tags$b("β", tags$sub("s")), " and ",
+          tags$b("β", tags$sub("r")),
+          " are transmission coefficients for sensitive and resistant parasites"
+        ),
+        tags$li(
+          tags$b("c", tags$sub("βr")),
+          " represents the transmission fitness cost of resistant parasites"
+        ),
+        tags$li(tags$b("N"), " is the total population size"),
+        tags$li(tags$b("season(t)"), " is the time-varying seasonal forcing function")
+      ),
+      
+      # Equation inline (MathJax)
+      tags$p(
+        HTML("The total force of infection is given by: $$\\lambda = \\lambda_{is} + \\lambda_{as} + \\lambda_{ir} + \\lambda_{ar}$$.")
+      ),
+      tags$p(
+        "New infections occur at rate ",
+        tags$b("λS"),
+        ", and are partitioned into symptomatic and asymptomatic infections according to strain-specific probabilities (",
+        tags$b("p", tags$sub("syms")), ", ",
+        tags$b("p", tags$sub("syma")), ")."
+      ),
+      
+      tags$p(
+        "Symptomatic infections are further distributed into treatment pathways (D0, D1, D2), while asymptomatic infections remain untreated."
+      ),
+      
+      tags$p(
+        "This formulation ensures that transmission depends on both the infectious reservoir composition and treatment structure."
+      ),
+      tags$div(
+        tags$h3("Fitness cost of resistant parasites"),
+        
+        tags$p(
+          "The model incorporates a transmission fitness cost for resistant parasites through the parameter ",
+          tags$b("c", tags$sub("βr")),
+          ", which scales the contribution of resistant infections to the force of infection. ",
+          "This is implemented directly in the expressions for ",
+          tags$b("λ", tags$sub("ir")),
+          " and ",
+          tags$b("λ", tags$sub("ar")),
+          ":"
+        ),
+        
+        withMathJax(),
+        tags$p(
+          HTML("$$\\lambda_{ir} \\propto \\beta_r c_{\\beta r}, \\quad \\lambda_{ar} \\propto \\beta_{ar} c_{\\beta r}$$")
+        ),
+        
+        tags$p(
+          "Thus, the effective transmission coefficients for resistant parasites become:"
+        ),
+        
+        tags$p(
+          HTML("$$\\beta_r^{eff} = c_{\\beta r}\\beta_r, \\quad \\beta_{ar}^{eff} = c_{\\beta r}\\beta_{ar}$$")
+        ),
+        
+        tags$p(
+          "When ",
+          tags$b("c", tags$sub("βr")),
+          " < 1, resistant parasites have reduced transmissibility relative to sensitive parasites in the absence of treatment. ",
+          "This reduction applies uniformly across both symptomatic and asymptomatic transmission pathways, reflecting the assumption that the fitness cost is an intrinsic property of the resistant parasite rather than dependent on clinical presentation."
+        ),
+        
+        tags$p(
+          "This parameter plays a key role in determining the rate of spread of resistance, as it counterbalances the transmission advantage of resistant parasites under drug pressure."
+        )
+      ),
+      tags$div(
+        tags$h3("Recovery and loss of immunity"),
+        
+        tags$p(
+          "Recovery in the model occurs through multiple pathways and contributes to the accumulation of individuals in the recovered compartments ",
+          tags$b("R", tags$sub("s")), " and ",
+          tags$b("R", tags$sub("r")), ". ",
+          "These compartments represent individuals who have cleared infection with sensitive or resistant parasites, respectively."
+        ),
+        
+        tags$p("The general structure of the recovery dynamics can be expressed as:"),
+        
+        withMathJax(),
+        tags$p(
+          HTML("$$\\frac{dR_s}{dt} = (\\text{recovery from sensitive infections}) - \\alpha R_s - \\mu_o R_s$$")
+        ),
+        tags$p(
+          HTML("$$\\frac{dR_r}{dt} = (\\text{recovery from resistant infections}) - \\alpha R_r - \\mu_o R_r$$")
+        ),
+        
+        tags$p("Recovery terms include:"),
+        
+        tags$ul(
+          tags$li(
+            "clearance of asymptomatic infections (",
+            tags$b("τ", tags$sub("as")), " ",
+            tags$b("A", tags$sub("s")), ", ",
+            tags$b("τ", tags$sub("ar")), " ",
+            tags$b("A", tags$sub("r")), ")"
+          ),
+          tags$li(
+            "clearance of gametocyte compartments (",
+            tags$b("τ", tags$sub("is,i")), " ",
+            tags$b("GI", tags$sub("s,i")), ", ",
+            tags$b("τ", tags$sub("ir,i")), " ",
+            tags$b("GI", tags$sub("r,i")), ", ",
+            tags$b("τ", tags$sub("ags")), " ",
+            tags$b("GA", tags$sub("s")), ", ",
+            tags$b("τ", tags$sub("agr")), " ",
+            tags$b("GA", tags$sub("r")), ")"
+          ),
+          tags$li(
+            "recovery from untreated symptomatic infections (",
+            tags$b("τ", tags$sub("ntsd0")), " ",
+            tags$b("I", tags$sub("s,0")), ", ",
+            tags$b("τ", tags$sub("ntrd0")), " ",
+            tags$b("I", tags$sub("r,0")), ")"
+          ),
+          tags$li(
+            "recovery following treatment success and failure (",
+            tags$b("τ", tags$sub("nfs")), " ",
+            tags$b("ST"), ", ",
+            tags$b("τ", tags$sub("fs")), " ",
+            tags$b("F"), ")"
+          )
+        ),
+        
+        tags$p(
+          "Recovered individuals lose immunity at rate ",
+          tags$b("α"),
+          " and return to the susceptible compartment:"
+        ),
+        
+        withMathJax(),
+        tags$p(
+          HTML("$$\\frac{dS}{dt} = \\mu_i N - \\mu_o S - \\lambda S + \\alpha (R_s + R_r)$$")
+        ),
+        
+        tags$p(
+          "Here ",
+          tags$b("μ", tags$sub("i")),
+          " and ",
+          tags$b("μ", tags$sub("o")),
+          " denote birth and death rates, respectively. ",
+          "This SIRS structure allows individuals to experience repeated infections over time, reflecting the partial and waning immunity characteristic of malaria in endemic settings."
+        )
+      ),
+      tags$div(
+        tags$h3("Model Equations"),
+        
+        tags$p(
+          "Equations for each compartment (S, A, I, ST, F, GI, GA, R) are defined below."
+        ),
+        
+        tags$h4("Susceptible"),
+        withMathJax(),
+        tags$p(HTML("$$\\frac{dS}{dt} = \\mu_i N - \\mu_o S - \\lambda S + \\alpha R_s + \\alpha R_r$$")),
+        
+        tags$h4("Asymptomatic (Sensitive)"),
+        tags$p(HTML("$$\\frac{dA_s}{dt} = p\\lambda S (1 - p_s) - \\gamma_{as} A_s - \\tau_{as} A_s - \\mu_o A_s$$")),
+        
+        tags$h4("Gametocytes from Asymptomatic (Sensitive)"),
+        tags$p(HTML("$$\\frac{dGA_s}{dt} = \\gamma_{as} A_s - \\tau_{ags} GA_s - \\mu_o GA_s$$")),
+        
+        tags$h4("Asymptomatic (Resistant)"),
+        tags$p(HTML("$$\\frac{dA_r}{dt} = (1-p)\\lambda S (1 - p_r) - \\gamma_{ar} A_r - \\tau_{ar} A_r - \\mu_o A_r$$")),
+        
+        tags$h4("Gametocytes from Asymptomatic (Resistant)"),
+        tags$p(HTML("$$\\frac{dGA_r}{dt} = \\gamma_{ar} A_r - \\tau_{agr} GA_r - \\mu_o GA_r$$")),
+        
+        tags$h4("Symptomatic (Sensitive), k = 0,1,2"),
+        tags$p(HTML("$$\\frac{dI_{s,k}}{dt} = (\\lambda_{is,k} S + \\lambda_{as} S)p_{sym_s}p_{is,k} - \\gamma_{is} I_{s,k} - \\mu_o I_{s,k}$$")),
+        
+        tags$p("For k = 0"),
+        tags$p(HTML("$$\\frac{dI_{s,0}}{dt} = \\frac{dI_{s,0}}{dt} - \\tau_{ntsd0} I_{s,0}$$")),
+        
+        tags$p("For k = 1,2"),
+        tags$p(HTML("$$\\frac{dI_{s,k}}{dt} = \\frac{dI_{s,k}}{dt} - I_{s,k}$$")),
+        
+        tags$h4("Symptomatic (Resistant), k = 0,1,2"),
+        tags$p(HTML("$$\\frac{dI_{r,k}}{dt} = (\\lambda_{ir,k} S + \\lambda_{ar} S)p_{sym_r}p_{ir,k} - \\gamma_{ir,k} I_{r,k} - \\mu_o I_{r,k}$$")),
+        
+        tags$p("For k = 0"),
+        tags$p(HTML("$$\\frac{dI_{r,0}}{dt} = \\frac{dI_{r,0}}{dt} - \\tau_{ntrd0} I_{r,0}$$")),
+        
+        tags$p("For k = 1,2"),
+        tags$p(HTML("$$\\frac{dI_{r,k}}{dt} = \\frac{dI_{r,k}}{dt} - I_{r,k}$$")),
+        
+        tags$h4("Treatment Success (Sensitive), k = 1,2"),
+        tags$p(HTML("$$\\frac{dST_{is,k}}{dt} = (1 - Failrate_s) I_{s,k} - (\\mu_o + \\gamma_{infs} + \\tau_{nfs}) ST_{is,k}$$")),
+        
+        tags$h4("Treatment Failure (Sensitive), k = 1,2"),
+        tags$p(HTML("$$\\frac{dF_{is,k}}{dt} = Failrate_s I_{s,k} - (\\mu_o + \\gamma_{ifs} + \\tau_{fs}) F_{is,k}$$")),
+        
+        tags$h4("Treatment Success (Resistant)"),
+        tags$p(HTML("$$\\frac{dST_{ir,k}}{dt} = (1 - Failrate_r) I_{r,k} - (\\mu_o + \\gamma_{infr} + \\tau_{nfr}) ST_{ir,k}$$")),
+        
+        tags$h4("Treatment Failure (Resistant)"),
+        tags$p(HTML("$$\\frac{dF_{ir,k}}{dt} = Failrate_r I_{r,k} - (\\mu_o + \\gamma_{ifr} + \\tau_{fr}) F_{ir,k}$$")),
+        
+        tags$h4("Gametocytes from Symptomatic (Sensitive)"),
+        tags$p("For k = 0"),
+        tags$p(HTML("$$\\frac{dG_{is,0}}{dt} = I_{s,0}\\gamma_{is,0} - (\\mu_o + \\tau_{is,0}) G_{is,0}$$")),
+        
+        tags$p("For k = 1,2"),
+        tags$p(HTML("$$\\frac{dG_{is,k}}{dt} = I_{s,k}\\gamma_{is,k} - (\\mu_o + \\tau_{is,k}) G_{is,k} + ST_{is,k}\\tau_{nfs} + F_{is,k}\\tau_{fs}$$")),
+        
+        tags$h4("Gametocytes from Symptomatic (Resistant)"),
+        tags$p("For k = 0"),
+        tags$p(HTML("$$\\frac{dG_{ir,0}}{dt} = I_{r,0}\\gamma_{ir,0} - (\\mu_o + \\tau_{ir,0}) G_{ir,0}$$")),
+        
+        tags$p("For k = 1,2"),
+        tags$p(HTML("$$\\frac{dG_{ir,k}}{dt} = I_{r,k}\\gamma_{ir,k} - (\\mu_o + \\tau_{ir,k}) G_{ir,k} + ST_{ir,k}\\tau_{nfr} + F_{ir,k}\\tau_{fr}$$")),
+        
+        tags$h4("Recovered (Sensitive)"),
+        tags$p(HTML("$$\\frac{dR_s}{dt} = \\tau_{as}A_s + \\tau_{ags}GA_s + \\tau_{ntsd0}I_{s,0} + \\sum_{k=0}^{2} G_{is,k}\\tau_{is,k} + \\sum_{k=1}^{2}(ST_{is,k}\\tau_{nfs} + F_{is,k}\\tau_{fs}) - (\\mu_o + \\alpha)R_s$$")),
+        
+        tags$h4("Recovered (Resistant)"),
+        tags$p(HTML("$$\\frac{dR_r}{dt} = \\tau_{ar}A_r + \\tau_{agr}GA_r + \\tau_{ntrd0}I_{r,0} + \\sum_{k=0}^{2} G_{ir,k}\\tau_{ir,k} + \\sum_{k=1}^{2}(ST_{ir,k}\\tau_{nfr} + F_{ir,k}\\tau_{fr}) - (\\mu_o + \\alpha)R_r$$"))
+      ),
+      tags$div(
+        tags$h3("Model Parameters"),
+        
+        tags$table(
+          class = "table table-bordered",
           
-          # Figure 2
-          tags$figure(
-            img(src = "img/figure2.jpg", style = "max-width:100%;"),
-            tags$figcaption(
-              "Figure 2. Full compartmental model of ",
-              tags$em("Plasmodium falciparum"),
-              " transmission incorporating treatment with ACT and low-dose primaquine. 
-      This complete model includes both artemisinin-sensitive and artemisinin-resistant parasite strains. 
-      The human population is divided into susceptible (S), asymptomatic (A), and symptomatic (I) compartments. 
-      Symptomatic infections are stratified by treatment status: untreated (D0), treated with ACT alone (D1), 
-      or treated with ACT plus low-dose primaquine (D2). Each infected class may produce gametocytes (G), which 
-      contribute to onward transmission. Treated individuals may either recover (ST: success) or experience 
-      treatment failure (F), with failures associated with higher gametocyte carriage. Recovered individuals (R) 
-      can lose immunity and return to susceptibility. Both strains share the same susceptible pool but differ in 
-      treatment failure rates and gametocyte dynamics. Seasonal variation modulates the force of infection for both strains."
+          tags$thead(
+            tags$tr(
+              tags$th("Symbol"),
+              tags$th("Description"),
+              tags$th("Units")
             )
           ),
-        h3("About the Simulation Scenarios"),
-        "This app explores how different malaria treatment strategies might affect the spread of artemisinin resistance in Uganda. The model assumes a population of ~24 million (as in 2000) with stable, seasonal malaria transmission. Users can compare three treatment pathways for symptomatic patients:",
-        tags$ul(
-          tags$li(tags$b("D0:")," No treatment"),
-          tags$li(tags$b("D1:")," Artemisinin-based combination therapy (ACT) only"),
-          tags$li(tags$b("D2:")," ACT plus low-dose primaquine (0.25 mg/kg)")
-        ),
-        "The simulations track key outcomes over time, including:",
-        tags$ul(
-          tags$li("Incidence of sensitive and resistant infections"),
-          tags$li("Numbers of asymptomatic and symptomatic cases"),
-          tags$li("Gametocyte carriage by strain type")
-        ),
-        "The model uses demographic data for Uganda (2000–2050) and incorporates changes in transmission patterns before and after 2015, reflecting the scale-up of insecticide-treated nets and indoor residual spraying.
-
-By comparing scenarios with different proportions of D0, D1, and D2, the app highlights the potential role of low-dose primaquine in reducing onward transmission of resistant malaria parasites."
+          
+          tags$tbody(
+            
+            tags$tr(
+              tags$td(tags$b("μ", tags$sub("i")), ", ", tags$b("μ", tags$sub("o"))),
+              tags$td("Birth and death rates"),
+              tags$td("per month")
+            ),
+            
+            tags$tr(
+              tags$td(tags$b("α")),
+              tags$td("Rate of waning immunity"),
+              tags$td("per month")
+            ),
+            
+            tags$tr(
+              tags$td(tags$b("β", tags$sub("si")), ", ", tags$b("β", tags$sub("ri"))),
+              tags$td("Transmission coefficients from gametocyte carriers"),
+              tags$td("per month")
+            ),
+            
+            tags$tr(
+              tags$td(tags$b("β", tags$sub("as")), ", ", tags$b("β", tags$sub("ar"))),
+              tags$td("Transmission from asymptomatic"),
+              tags$td("per month")
+            ),
+            
+            tags$tr(
+              tags$td(tags$b("γ", tags$sub("*"))),
+              tags$td("Gametocyte production rates"),
+              tags$td("per month")
+            ),
+            
+            tags$tr(
+              tags$td(tags$b("τ", tags$sub("*"))),
+              tags$td("Recovery/removal rates"),
+              tags$td("per month")
+            ),
+            
+            tags$tr(
+              tags$td(tags$b("p")),
+              tags$td("Fraction of infections that are sensitive"),
+              tags$td("Unitless")
+            ),
+            
+            tags$tr(
+              tags$td(tags$b("p", tags$sub("s")), ", ", tags$b("p", tags$sub("r"))),
+              tags$td("Probability of becoming symptomatic"),
+              tags$td("Unitless")
+            ),
+            
+            tags$tr(
+              tags$td(tags$b("f", tags$sub("s")), ", ", tags$b("f", tags$sub("r"))),
+              tags$td("Probability of treatment failure"),
+              tags$td("Unitless")
+            ),
+            
+            tags$tr(
+              tags$td(
+                tags$b("flo"), ", ",
+                tags$b("amp"), ", ",
+                tags$b("period"), ", ",
+                tags$b("phase")
+              ),
+              tags$td("Seasonal transmission parameters"),
+              tags$td("Varies")
+            )
+            
+          )
+        )
+      ),
         
     ),
     div(id="simulation",
@@ -282,7 +655,6 @@ By comparing scenarios with different proportions of D0, D1, and D2, the app hig
                 tabPanel(title="Fraction of transmission & Resistant fraction",
                          withSpinner(plotOutput("Plot_ft")),
                          br(),
-                         withSpinner(verbatimTextOutput("kT_star_text")),
                          hr(),
                          br(),
                          withSpinner(plotOutput("Plot_p_res")),
@@ -1043,13 +1415,6 @@ server <- function(session,input, output ) {
     legend("bottomleft", c("Baseline","Treatment D2"), col = c(1), lty = c(1, 2),lwd=2)
   })
   
-  output$kT_star_text <- renderText({
-    out_in_year <- ode_results()
-    keep <- out_in_year[, "F_T"] 
-    FT_mean <- mean(keep, na.rm = TRUE)
-
-    paste("Treatment-associated transmission advantage:", round(FT_mean, 2))
-  })
 
 }
 

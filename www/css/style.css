@@ -38,3 +38,11 @@ hr{
     color: black;
     border: 2px black solid !important;
 }
+  table, th, td {
+    border: 1px solid black !important;
+    margin: 2px 2px 2px 2px;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
