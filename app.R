@@ -62,12 +62,13 @@ summarise_by_year <- function(out, vars_all, n_years, start_year = 2000) {
 
 ui <- dashboardPage(
   dashboardHeader(title = "MalariaPQ",
+                  titleWidth ="300px",
                   tags$li(actionLink("goto_intro", HTML("<b>Introduction</b>"), class = "btn btn-default"), class = "dropdown"),
                   tags$li(actionLink("goto_simulation", HTML("<b>Simulation</b>"), class = "btn btn-default"), class = "dropdown"),
                   tags$li(actionLink("goto_about", HTML("<b>About us</b>"), class = "btn btn-default"), class = "dropdown"),
                   tags$li(actionLink("goto_data", HTML("<b>Source Data</b>"), class = "btn btn-default"), class = "dropdown")
                   ),
-  dashboardSidebar(
+  dashboardSidebar(width="300px",
     sidebarMenu(
 
       # useShinyjs(),
@@ -208,6 +209,7 @@ ui <- dashboardPage(
         href = "css/style.css")
     ),
     div(id="intro",
+        div(class="general-card",
         h3("Model Overview"),
         HTML("<p>We developed a deterministic compartmental model to capture the transmission dynamics of Plasmodium falciparum in a human population, with the goal of evaluating the potential impact of artemisinin-based combination therapy (ACT) and ACT combined with a single low-dose of primaquine (PQ) on gametocyte prevalence and resistance propagation. The model stratifies infections by clinical presentation (asymptomatic or symptomatic), treatment status (no treatment, ACT, or ACT+PQ), and parasite phenotype (artemisinin-sensitive vs. artemisinin-resistant).</p>
              
@@ -292,7 +294,23 @@ ui <- dashboardPage(
         
           # Figure 1
           tags$figure(
-            img(src = "img/figure1.png", style = "max-width:100%;"),
+            tags$div(
+              class = "img-container",
+              
+              tags$img(
+                src = "img/figure1.png",
+                class = "zoom-img",
+                onclick = "document.getElementById('imgModal').style.display='block'"
+              ),
+              
+              tags$div(
+                id = "imgModal",
+                class = "img-modal",
+                onclick = "this.style.display='none'",
+                
+                tags$img(src = "img/figure1.png", class = "img-modal-content")
+              )
+            ),
             tags$figcaption(tags$b(
               "Figure 1. Compartmental model of ",
               tags$em("Plasmodium falciparum"),
@@ -307,8 +325,8 @@ ui <- dashboardPage(
       of infection."
             )
           ),
-          
-          br(), 
+        ),
+      div(class="general-card",
       h3("Transmission Dynamics"),
       tags$p("Transmission in the model is governed by the force of infection arising from infectious gametocyte carriers in the human population. The total force of infection is decomposed into contributions from four sources: symptomatic and asymptomatic infections with artemisinin-sensitive parasites, and symptomatic and asymptomatic infections with artemisinin-resistant parasites."),
       tags$p("Specifically, the force of infection components are defined as:"),
@@ -368,7 +386,8 @@ ui <- dashboardPage(
       tags$p(
         "This formulation ensures that transmission depends on both the infectious reservoir composition and treatment structure."
       ),
-      tags$div(
+      ),
+      tags$div(class="general-card",
         tags$h3("Fitness cost of resistant parasites"),
         
         tags$p(
@@ -381,8 +400,6 @@ ui <- dashboardPage(
           tags$b("λ", tags$sub("ar")),
           ":"
         ),
-        
-        withMathJax(),
         tags$p(
           HTML("$$\\lambda_{ir} \\propto \\beta_r c_{\\beta r}, \\quad \\lambda_{ar} \\propto \\beta_{ar} c_{\\beta r}$$")
         ),
@@ -406,7 +423,7 @@ ui <- dashboardPage(
           "This parameter plays a key role in determining the rate of spread of resistance, as it counterbalances the transmission advantage of resistant parasites under drug pressure."
         )
       ),
-      tags$div(
+      tags$div(class="general-card",
         tags$h3("Recovery and loss of immunity"),
         
         tags$p(
@@ -415,10 +432,7 @@ ui <- dashboardPage(
           tags$b("R", tags$sub("r")), ". ",
           "These compartments represent individuals who have cleared infection with sensitive or resistant parasites, respectively."
         ),
-        
         tags$p("The general structure of the recovery dynamics can be expressed as:"),
-        
-        withMathJax(),
         tags$p(
           HTML("$$\\frac{dR_s}{dt} = (\\text{recovery from sensitive infections}) - \\alpha R_s - \\mu_o R_s$$")
         ),
@@ -468,8 +482,6 @@ ui <- dashboardPage(
           tags$b("α"),
           " and return to the susceptible compartment:"
         ),
-        
-        withMathJax(),
         tags$p(
           HTML("$$\\frac{dS}{dt} = \\mu_i N - \\mu_o S - \\lambda S + \\alpha (R_s + R_r)$$")
         ),
@@ -483,46 +495,66 @@ ui <- dashboardPage(
           "This SIRS structure allows individuals to experience repeated infections over time, reflecting the partial and waning immunity characteristic of malaria in endemic settings."
         )
       ),
-      tags$div(
+      tags$div(class="general-card",
         tags$h3("Model Equations"),
         
         tags$p(
           "Equations for each compartment (S, A, I, ST, F, GI, GA, R) are defined below."
         ),
-        
-        tags$h4("Susceptible"),
-        withMathJax(),
-        tags$p(HTML("$$\\frac{dS}{dt} = \\mu_i N - \\mu_o S - \\lambda S + \\alpha R_s + \\alpha R_r$$")),
-        
-        tags$h4("Asymptomatic (Sensitive)"),
-        tags$p(HTML("$$\\frac{dA_s}{dt} = p\\lambda S (1 - p_s) - \\gamma_{as} A_s - \\tau_{as} A_s - \\mu_o A_s$$")),
-        
-        tags$h4("Gametocytes from Asymptomatic (Sensitive)"),
-        tags$p(HTML("$$\\frac{dGA_s}{dt} = \\gamma_{as} A_s - \\tau_{ags} GA_s - \\mu_o GA_s$$")),
-        
-        tags$h4("Asymptomatic (Resistant)"),
-        tags$p(HTML("$$\\frac{dA_r}{dt} = (1-p)\\lambda S (1 - p_r) - \\gamma_{ar} A_r - \\tau_{ar} A_r - \\mu_o A_r$$")),
-        
-        tags$h4("Gametocytes from Asymptomatic (Resistant)"),
-        tags$p(HTML("$$\\frac{dGA_r}{dt} = \\gamma_{ar} A_r - \\tau_{agr} GA_r - \\mu_o GA_r$$")),
-        
-        tags$h4("Symptomatic (Sensitive), k = 0,1,2"),
-        tags$p(HTML("$$\\frac{dI_{s,k}}{dt} = (\\lambda_{is,k} S + \\lambda_{as} S)p_{sym_s}p_{is,k} - \\gamma_{is} I_{s,k} - \\mu_o I_{s,k}$$")),
-        
-        tags$p("For k = 0"),
-        tags$p(HTML("$$\\frac{dI_{s,0}}{dt} = \\frac{dI_{s,0}}{dt} - \\tau_{ntsd0} I_{s,0}$$")),
-        
-        tags$p("For k = 1,2"),
-        tags$p(HTML("$$\\frac{dI_{s,k}}{dt} = \\frac{dI_{s,k}}{dt} - I_{s,k}$$")),
-        
-        tags$h4("Symptomatic (Resistant), k = 0,1,2"),
-        tags$p(HTML("$$\\frac{dI_{r,k}}{dt} = (\\lambda_{ir,k} S + \\lambda_{ar} S)p_{sym_r}p_{ir,k} - \\gamma_{ir,k} I_{r,k} - \\mu_o I_{r,k}$$")),
-        
-        tags$p("For k = 0"),
-        tags$p(HTML("$$\\frac{dI_{r,0}}{dt} = \\frac{dI_{r,0}}{dt} - \\tau_{ntrd0} I_{r,0}$$")),
-        
-        tags$p("For k = 1,2"),
-        tags$p(HTML("$$\\frac{dI_{r,k}}{dt} = \\frac{dI_{r,k}}{dt} - I_{r,k}$$")),
+        div(class="row",
+          div(class="col-sm-12",
+            tags$h4("Susceptible"),
+            tags$p(HTML("$$\\frac{dS}{dt} = \\mu_i N - \\mu_o S - \\lambda S + \\alpha R_s + \\alpha R_r$$")),
+          ),
+        ),
+        div(class="row",
+          div(class="col-sm-6",
+            tags$h4("Asymptomatic (Sensitive)"),
+            tags$p(HTML("$$\\frac{dA_s}{dt} = p\\lambda S (1 - p_s) - \\gamma_{as} A_s - \\tau_{as} A_s - \\mu_o A_s$$")),
+          ),
+          div(class="col-sm-6",
+            tags$h4("Asymptomatic (Resistant)"),
+            tags$p(HTML("$$\\frac{dA_r}{dt} = (1-p)\\lambda S (1 - p_r) - \\gamma_{ar} A_r - \\tau_{ar} A_r - \\mu_o A_r$$")),
+          ),
+        ),
+        div(class="row",
+          div(class="col-sm-6",
+            tags$h4("Gametocytes from Asymptomatic (Sensitive)"),
+            tags$p(HTML("$$\\frac{dGA_s}{dt} = \\gamma_{as} A_s - \\tau_{ags} GA_s - \\mu_o GA_s$$")),
+          ),
+          div(class="col-sm-6",
+            tags$h4("Gametocytes from Asymptomatic (Resistant)"),
+            tags$p(HTML("$$\\frac{dGA_r}{dt} = \\gamma_{ar} A_r - \\tau_{agr} GA_r - \\mu_o GA_r$$")),
+          ),
+        ),
+        div(class="row",
+            div(class="col-sm-12",
+              tags$h4("Symptomatic (Sensitive), k = 0,1,2"),
+              tags$p(HTML("$$\\frac{dI_{s,k}}{dt} = (\\lambda_{is,k} S + \\lambda_{as} S)p_{sym_s}p_{is,k} - \\gamma_{is} I_{s,k} - \\mu_o I_{s,k}$$")),
+            ),
+            div(class="col-sm-6",
+          tags$p("For k = 0"),
+          tags$p(HTML("$$\\frac{dI_{s,0}}{dt} = \\frac{dI_{s,0}}{dt} - \\tau_{ntsd0} I_{s,0}$$")),
+            ),
+            div(class="col-sm-6",
+          tags$p("For k = 1,2"),
+          tags$p(HTML("$$\\frac{dI_{s,k}}{dt} = \\frac{dI_{s,k}}{dt} - I_{s,k}$$")),
+            ),
+        ),
+        div(class="row",
+            div(class="col-sm-12",
+              tags$h4("Symptomatic (Resistant), k = 0,1,2"),
+              tags$p(HTML("$$\\frac{dI_{r,k}}{dt} = (\\lambda_{ir,k} S + \\lambda_{ar} S)p_{sym_r}p_{ir,k} - \\gamma_{ir,k} I_{r,k} - \\mu_o I_{r,k}$$")),
+            ),
+            div(class="col-sm-6",
+              tags$p("For k = 0"),
+              tags$p(HTML("$$\\frac{dI_{r,0}}{dt} = \\frac{dI_{r,0}}{dt} - \\tau_{ntrd0} I_{r,0}$$")),
+            ),
+            div(class="col-sm-6",
+              tags$p("For k = 1,2"),
+              tags$p(HTML("$$\\frac{dI_{r,k}}{dt} = \\frac{dI_{r,k}}{dt} - I_{r,k}$$")),
+            ),
+        ),
         
         tags$h4("Treatment Success (Sensitive), k = 1,2"),
         tags$p(HTML("$$\\frac{dST_{is,k}}{dt} = (1 - Failrate_s) I_{s,k} - (\\mu_o + \\gamma_{infs} + \\tau_{nfs}) ST_{is,k}$$")),
@@ -535,32 +567,41 @@ ui <- dashboardPage(
         
         tags$h4("Treatment Failure (Resistant)"),
         tags$p(HTML("$$\\frac{dF_{ir,k}}{dt} = Failrate_r I_{r,k} - (\\mu_o + \\gamma_{ifr} + \\tau_{fr}) F_{ir,k}$$")),
-        
-        tags$h4("Gametocytes from Symptomatic (Sensitive)"),
-        tags$p("For k = 0"),
-        tags$p(HTML("$$\\frac{dG_{is,0}}{dt} = I_{s,0}\\gamma_{is,0} - (\\mu_o + \\tau_{is,0}) G_{is,0}$$")),
-        
-        tags$p("For k = 1,2"),
-        tags$p(HTML("$$\\frac{dG_{is,k}}{dt} = I_{s,k}\\gamma_{is,k} - (\\mu_o + \\tau_{is,k}) G_{is,k} + ST_{is,k}\\tau_{nfs} + F_{is,k}\\tau_{fs}$$")),
-        
+        div(class="row",
+            
+            tags$h4("Gametocytes from Symptomatic (Sensitive)"),
+            div(class="col-md-6",
+            tags$p("For k = 0"),
+            tags$p(HTML("$$\\frac{dG_{is,0}}{dt} = I_{s,0}\\gamma_{is,0} - (\\mu_o + \\tau_{is,0}) G_{is,0}$$")),
+            ),
+            div(class="col-md-6",
+            tags$p("For k = 1,2"),
+            tags$p(HTML("$$\\frac{dG_{is,k}}{dt} = I_{s,k}\\gamma_{is,k} - (\\mu_o + \\tau_{is,k}) G_{is,k} + ST_{is,k}\\tau_{nfs} + F_{is,k}\\tau_{fs}$$")),
+            
+            ),
+        ),
+        div(class="row",
         tags$h4("Gametocytes from Symptomatic (Resistant)"),
+        div(class="col-md-6",
         tags$p("For k = 0"),
         tags$p(HTML("$$\\frac{dG_{ir,0}}{dt} = I_{r,0}\\gamma_{ir,0} - (\\mu_o + \\tau_{ir,0}) G_{ir,0}$$")),
-        
+        ),
+        div(class="col-md-6",
         tags$p("For k = 1,2"),
         tags$p(HTML("$$\\frac{dG_{ir,k}}{dt} = I_{r,k}\\gamma_{ir,k} - (\\mu_o + \\tau_{ir,k}) G_{ir,k} + ST_{ir,k}\\tau_{nfr} + F_{ir,k}\\tau_{fr}$$")),
-        
+        ),
+        ),
         tags$h4("Recovered (Sensitive)"),
         tags$p(HTML("$$\\frac{dR_s}{dt} = \\tau_{as}A_s + \\tau_{ags}GA_s + \\tau_{ntsd0}I_{s,0} + \\sum_{k=0}^{2} G_{is,k}\\tau_{is,k} + \\sum_{k=1}^{2}(ST_{is,k}\\tau_{nfs} + F_{is,k}\\tau_{fs}) - (\\mu_o + \\alpha)R_s$$")),
         
         tags$h4("Recovered (Resistant)"),
         tags$p(HTML("$$\\frac{dR_r}{dt} = \\tau_{ar}A_r + \\tau_{agr}GA_r + \\tau_{ntrd0}I_{r,0} + \\sum_{k=0}^{2} G_{ir,k}\\tau_{ir,k} + \\sum_{k=1}^{2}(ST_{ir,k}\\tau_{nfr} + F_{ir,k}\\tau_{fr}) - (\\mu_o + \\alpha)R_r$$"))
       ),
-      tags$div(
+      tags$div(class="general-card",
         tags$h3("Model Parameters"),
         
         tags$table(
-          class = "table table-bordered",
+          class = "param-table",
           
           tags$thead(
             tags$tr(
@@ -696,7 +737,7 @@ ui <- dashboardPage(
                 )
                 ),
     ),
-                div(id="about_us",
+                div(id="about_us",class = "source-card",
                     tags$b("Model Development Team:"),
                     br(),
                     "Assoc. Prof. Wirichada Pan-ngum (email: ", tags$a(href="mailto:pan@tropmedres.ac", "pan@tropmedres.ac"),")",
@@ -713,9 +754,72 @@ ui <- dashboardPage(
                     "Dr. Thomas J Peto (email: ", tags$a(href="mailto:Tom@tropmedres.ac", "Tom@tropmedres.ac"),")",
                     ),
     div(id="Data",
-        h3("Source Data"),
-        p("Below is the list of source data and their citations:"),
-        tableOutput("source_table")
+        tags$div(
+          class = "source-card",
+          
+          tags$h3("Source Data", class = "source-title"),
+          tags$p("Below is the list of source data and their citations:", 
+                 class = "source-subtitle"),
+          
+          tags$table(
+            class = "source-table",
+            
+            tags$thead(
+              tags$tr(
+                tags$th("Description"),
+                tags$th("Citation")
+              )
+            ),
+            
+            tags$tbody(
+              
+              tags$tr(
+                tags$td("Rate of loss of immunity"),
+                tags$td(
+                  tags$a(
+                    href = "https://doi.org/10.1371/journal.pone.0001767",
+                    "DOI: 10.1371/journal.pone.0001767",
+                    target = "_blank"
+                  )
+                )
+              ),
+              
+              tags$tr(
+                tags$td("Rate of recovery ACT & Primaquine 0.0625 mg/kg"),
+                tags$td(
+                  tags$a(
+                    href = "https://doi.org/10.1002/cpt.2512",
+                    "DOI: 10.1002/cpt.2512",
+                    target = "_blank"
+                  )
+                )
+              ),
+              
+              tags$tr(
+                tags$td("Population of Tanzania"),
+                tags$td(
+                  tags$a(
+                    href = "https://data.who.int/countries/834",
+                    "WHO Data Tanzania",
+                    target = "_blank"
+                  )
+                )
+              ),
+              
+              tags$tr(
+                tags$td("Malaria Incidence of Tanzania"),
+                tags$td(
+                  tags$a(
+                    href = "https://www.who.int/teams/global-malaria-programme/reports/world-malaria-report-2024",
+                    "WHO World Malaria Report 2024",
+                    target = "_blank"
+                  )
+                )
+              )
+              
+            )
+          )
+        )
     ),
     
   )

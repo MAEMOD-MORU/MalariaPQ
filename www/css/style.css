@@ -1,4 +1,39 @@
-body, p, h1, h2, h3, h4, h5, h6, span{
+html {
+  font-size: clamp(14px, 0.9vw + 0.3vh, 20px);
+}
+/* ===== TEXT ===== */
+p,span,div,li,td,th,label,input,textarea,button,
+a#goto_intro,a#goto_simulation,a#goto_about,a#goto_data
+{
+  font-size: 1rem;
+}
+a.sidebar-toggle{
+  font-size:0.8rem;
+}
+
+/* ===== HEADINGS ===== */
+h1 { font-size: 2.8rem; }
+h2 { font-size: 2.2rem; }
+h3 { font-size: 1.8rem; }
+h4 { font-size: 1.5rem; }
+h5 { font-size: 1.3rem; }
+h6 { font-size: 1.1rem; }
+
+small,figcaption {
+  font-size: 0.95rem;
+}
+
+b,strong {
+  font-weight: 700;
+}
+
+
+code,pre {
+  font-size: 0.9rem;
+}
+
+p,span,div,li,td,th,label,input,textarea,
+button , h1, h2, h3, h4, h5, h6{
  /*font-family: "Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif;*/
   font-family: Inter, sans-serif;
   font-feature-settings: 'liga' 1, 'calt' 1; /* fix for Chrome */
@@ -28,7 +63,7 @@ div.navbar-custom-menu{
   color:black;
 }
 .tab-pane.active{
-  background-color: #fafcfe;
+  background-color: #fafbfc;
   padding: 15px;
   border: 1px black solid;
   border-radius: 10px;
@@ -38,11 +73,239 @@ hr{
     color: black;
     border: 2px black solid !important;
 }
-  table, th, td {
-    border: 1px solid black !important;
-    margin: 2px 2px 2px 2px;
+.param-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+  overflow-x: auto;
+}
+
+.param-title {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-weight: 700;
+  color: #1f2d3d;
+  letter-spacing: 0.3px;
+}
+
+.param-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.param-table thead th {
+  background: #1e465e;
+  color: white;
+  text-align: left;
+  padding: 14px 16px;
+  font-weight: 700;
+  border: 1px solid #999999; 
+}
+
+.param-table tbody td {
+  padding: 14px 16px;
+  color: #2b2b2b;
+  vertical-align: middle;
+}
+
+.param-table th,
+.param-table td {
+  border: 1px solid #999999;
+}
+
+.param-table tbody tr:nth-child(even) {
+  background-color: #e8eaec;
+}
+
+.param-table tbody tr:hover {
+  background-color: #dfe8f2;
+  transition: background-color 0.2s ease;
+}
+
+
+.param-table td:first-child {
+  font-weight: 600;
+  color: #16324f;
+  width: 28%;
+  white-space: nowrap;
+}
+
+.param-table td:nth-child(2) {
+  width: 58%;
+}
+
+.param-table td:last-child {
+  width: 14%;
+  color: #5b6675;
+  font-style: italic;
+}
+
+.param-table sub {
+  font-size: 75%;
+  vertical-align: sub;
+}
+
+
+
+@media (max-width: 768px) {
+  .param-title {
+    font-size: 22px;
   }
-  table {
-    border-collapse: collapse;
-    width: 100%;
+
+  .param-table {
+    font-size: 14px;
   }
+
+  .param-table thead th,
+  .param-table tbody td {
+    padding: 10px 12px;
+  }
+}
+
+.source-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+}
+
+.source-title {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1f2d3d;
+}
+
+.source-subtitle {
+  margin-bottom: 16px;
+  color: #5b6675;
+  font-size: 15px;
+}
+
+.zoom-img {
+  display: block;
+  margin: 20px auto;
+  max-width: 40%;
+  cursor: zoom-in;
+  transition: transform 0.2s ease;
+}
+
+.zoom-img:hover {
+  transform: scale(1.02);
+}
+
+.img-modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  padding-top: 60px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+.img-modal-content {
+  margin: auto;
+  display: block;
+  max-width: 95%;
+  max-height: 95%;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+#intro figure {
+  margin-top: 20px;
+  text-align: center;
+}
+
+#intro figcaption {
+  margin-top: 10px;
+  color: #5b6675;
+}
+.general-card {
+  background: #fafbfc;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+}
+
+.source-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+  border: 1px solid #d9e2ec; /* 👈 เพิ่มกรอบ card */
+}
+
+.source-title {
+  margin-top: 0;
+  margin-bottom: 6px;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1f2d3d;
+}
+
+.source-subtitle {
+  margin-bottom: 16px;
+  color: #5b6675;
+  font-size: 15px;
+}
+
+.source-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.source-table thead th {
+  background: #1e465e;
+  color: white;
+  text-align: left;
+  padding: 14px 16px;
+  font-weight: 700;
+  border: 1px solid #999999; 
+}
+
+.source-table tbody td {
+  padding: 14px 16px;
+  color: #2b2b2b;
+  vertical-align: middle;
+}
+
+.source-table th,
+.source-table td {
+  border: 1px solid #999999;
+}
+
+.source-table tr:nth-child(even) {
+  background-color: #f8fbff;
+}
+
+.source-table tr:hover {
+  background-color: #eef6ff;
+}
+
+/* 🔗 Link styling */
+.source-table a {
+  color: #1f6feb;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.source-table a:hover {
+  text-decoration: underline;
+  color: #0b4db3;
+}
