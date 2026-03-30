@@ -1,3 +1,59 @@
+:root {
+  --tz-green: #1EB53A;
+  --tz-blue: #00A3DD;
+  --tz-yellow: #FCD116;
+  --tz-black: #111111;
+  --tz-bg: #F4F6F8;
+}
+
+.flag-accent {
+    height: 18px;
+    margin-bottom: 24px;
+    border-radius: 10px;
+    background: linear-gradient(
+      135deg,
+      var(--tz-green) 0%,
+      var(--tz-green) 38%,
+      var(--tz-yellow) 38%,
+      var(--tz-yellow) 42%,
+      var(--tz-black) 42%,
+      var(--tz-black) 58%,
+      var(--tz-yellow) 58%,
+      var(--tz-yellow) 62%,
+      var(--tz-blue) 62%,
+      var(--tz-blue) 100%
+    );
+}
+
+
+.skin-blue .sidebar-menu>li>a:hover,
+.skin-blue .sidebar-menu>li>a:focus,
+.skin-blue .sidebar-menu>li.active>a, 
+.skin-blue .sidebar-menu>li:hover>a{
+    border-left: 3px solid var(--tz-yellow);
+}
+
+.skin-blue .left-side, .skin-blue .main-sidebar, .skin-blue .wrapper {
+    background-color: var(--tz-black);
+}
+
+.skin-blue .main-header .navbar {
+    background-color: var(--tz-green);
+}
+.sidebar-toggle:hover{
+   background-color: #169b30 !important;
+}
+.sidebar-toggle:focus{
+     background-color: var(--tz-black) !important;
+  color: var(--tz-yellow) !important;
+}
+
+.skin-blue .main-header .logo {
+    background-color: var(--tz-blue);
+    color: #fff;
+    border-bottom: 0 solid transparent;
+}
+
 html {
   font-size: clamp(14px, 0.9vw + 0.3vh, 20px);
 }
@@ -6,6 +62,12 @@ p,span,div,li,td,th,label,input,textarea,button,
 a#goto_intro,a#goto_simulation,a#goto_about,a#goto_data
 {
   font-size: 1rem;
+}
+.MathJax { 
+  font-size: 1.5rem; !important; 
+}
+.MathJax_Display{
+  overflow-x: auto;
 }
 a.sidebar-toggle{
   font-size:0.8rem;
@@ -44,17 +106,19 @@ button , h1, h2, h3, h4, h5, h6{
 div.navbar-custom-menu{
   float: left !important; 
 }
-.action-button.btn.btn-default.shiny-bound-input:hover{
-  /*#1387c0*/
-  background-color: #cfe7f2!important;
-}
-.action-button.btn.btn-default.shiny-bound-input:focus{
-  background-color: #296282!important;
-  color: #0b5173;
+.btn-default{
+  background-color: var(--tz-green) !important;
+  color: white !important;
+  border: none;
 }
 
-.btn-default{
-      background-color: #3c8dbc;
+.action-button.btn.btn-default.shiny-bound-input:hover{
+  background-color: #169b30 !important;
+}
+
+.action-button.btn.btn-default.shiny-bound-input:focus{
+  background-color: var(--tz-black) !important;
+  color: var(--tz-yellow) !important;
 }
 #reset_all{
   background-color: whitesmoke;
@@ -89,7 +153,29 @@ hr{
   color: #1f2d3d;
   letter-spacing: 0.3px;
 }
+table {
+  width: 100%;
+  table-layout: fixed;
+}
 
+td, th {
+  white-space: normal !important;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  vertical-align: middle;
+}
+#goTopButton {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  display: inline-block;
+  background-color: var(--tz-blue);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 9999;
+}
 .param-table {
   width: 100%;
   border-collapse: collapse;
@@ -120,14 +206,12 @@ hr{
 }
 
 .param-table tbody tr:nth-child(even) {
-  background-color: #e8eaec;
+  background-color: #e8f7ec; /* เขียวอ่อน */
 }
 
 .param-table tbody tr:hover {
-  background-color: #dfe8f2;
-  transition: background-color 0.2s ease;
+  background-color: #fff6cc; /* เหลืองอ่อน */
 }
-
 
 .param-table td:first-child {
   font-weight: 600;
@@ -236,6 +320,12 @@ hr{
   padding: 20px 24px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   margin: 20px 0;
+  margin-bottom: 40px;
+}
+.param-table thead th,
+.source-table thead th {
+  background: var(--tz-blue);
+  color: white;
 }
 
 .source-card {
@@ -271,7 +361,6 @@ hr{
 }
 
 .source-table thead th {
-  background: #1e465e;
   color: white;
   text-align: left;
   padding: 14px 16px;
@@ -291,21 +380,47 @@ hr{
 }
 
 .source-table tr:nth-child(even) {
-  background-color: #f8fbff;
+  background-color: #e8f7ec;
 }
 
 .source-table tr:hover {
-  background-color: #eef6ff;
+  background-color: #fff6cc;
 }
 
 /* 🔗 Link styling */
 .source-table a {
-  color: #1f6feb;
-  text-decoration: none;
-  font-weight: 500;
+  color: var(--tz-blue);
 }
 
 .source-table a:hover {
-  text-decoration: underline;
-  color: #0b4db3;
+  color: var(--tz-green);
+}
+
+.param-card,
+.source-card,
+.general-card {
+  border-left: 6px solid var(--tz-yellow);
+}
+
+.param-title,
+.source-title {
+  color: var(--tz-black);
+}
+
+hr{
+  border: none !important;
+  height: 4px;
+  background: linear-gradient(
+    135deg,
+    var(--tz-green) 0%,
+    var(--tz-green) 40%,
+    var(--tz-yellow) 40%,
+    var(--tz-yellow) 45%,
+    var(--tz-black) 45%,
+    var(--tz-black) 55%,
+    var(--tz-yellow) 55%,
+    var(--tz-yellow) 60%,
+    var(--tz-blue) 60%,
+    var(--tz-blue) 100%
+  );
 }
