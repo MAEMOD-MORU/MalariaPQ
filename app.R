@@ -577,7 +577,8 @@ ui <- dashboardPage(
         ),
         tags$p("Specifically, the force of infection components are defined as:"),
         withMathJax(),
-        
+        div(
+          class = "eq-box",
         HTML(
           "$$season(t) = flo + amp \\sin\\left(\\frac{2\\pi}{period}(phase + t)\\right)$$"
         ),
@@ -590,6 +591,7 @@ ui <- dashboardPage(
   &\\lambda_{ar} &= season(t) \\frac{\\beta_{ar} c_{\\beta r} GA_r}{N(t)}
   \\end{aligned}$$
   "
+        )
         ),
         tags$p("where:"),
         # Text + subscripts (NO MathJax)
@@ -622,12 +624,15 @@ ui <- dashboardPage(
             " is the time-varying seasonal forcing function"
           )
         ),
-        
+        tags$p("The total force of infection is given by:"),
         # Equation inline (MathJax)
+        div(
+          class = "eq-box",
         tags$p(
           HTML(
-            "The total force of infection is given by: $$\\lambda = \\lambda_{is} + \\lambda_{as} + \\lambda_{ir} + \\lambda_{ar}$$."
+            "$$\\lambda = \\lambda_{is} + \\lambda_{as} + \\lambda_{ir} + \\lambda_{ar}$$"
           )
+        )
         ),
         tags$p(
           "New infections occur at rate ",
@@ -661,20 +666,25 @@ ui <- dashboardPage(
           tags$b("λ", tags$sub("ar")),
           ":"
         ),
+        div(
+          class = "eq-box",
         tags$p(
           HTML(
             "$$\\lambda_{ir} \\propto \\beta_r c_{\\beta r}, \\quad \\lambda_{ar} \\propto \\beta_{ar} c_{\\beta r}$$"
           )
+        )
         ),
         
         tags$p(
           "Thus, the effective transmission coefficients for resistant parasites become:"
         ),
-        
+        div(
+          class = "eq-box",
         tags$p(
           HTML(
             "$$\\beta_r^{eff} = c_{\\beta r}\\beta_r, \\quad \\beta_{ar}^{eff} = c_{\\beta r}\\beta_{ar}$$"
           )
+        )
         ),
         
         tags$p(
@@ -703,6 +713,8 @@ ui <- dashboardPage(
         tags$p(
           "The general structure of the recovery dynamics can be expressed as:"
         ),
+        div(
+          class = "eq-box",
         tags$p(
           HTML(
             "$$\\frac{dR_s}{dt} = (\\text{recovery from sensitive infections}) - \\alpha R_s - \\mu_o R_s$$"
@@ -713,7 +725,7 @@ ui <- dashboardPage(
             "$$\\frac{dR_r}{dt} = (\\text{recovery from resistant infections}) - \\alpha R_r - \\mu_o R_r$$"
           )
         ),
-        
+        ),
         tags$p("Recovery terms include:"),
         
         tags$ul(
@@ -776,10 +788,13 @@ ui <- dashboardPage(
           tags$b("α"),
           " and return to the susceptible compartment:"
         ),
+        div(
+          class = "eq-box",
         tags$p(
           HTML(
             "$$\\frac{dS}{dt} = \\mu_i N - \\mu_o S - \\lambda S + \\alpha (R_s + R_r)$$"
           )
+        )
         ),
         
         tags$p(
@@ -798,7 +813,7 @@ ui <- dashboardPage(
         tags$p(
           "Equations for each compartment (S, A, I, ST, F, GI, GA, R) are defined below."
         ),
-        div(class = "row", div(
+        div(class = "row eq-box", div(
           class = "col-sm-12", tags$h4("Susceptible"), tags$p(
             HTML(
               "$$\\frac{dS}{dt} = \\mu_i N - \\mu_o S - \\lambda S + \\alpha R_s + \\alpha R_r$$"
@@ -806,22 +821,22 @@ ui <- dashboardPage(
           ),
         ), ),
         div(
-          class = "row",
-          div(class = "col-sm-6", tags$h4("Asymptomatic (Sensitive)"), tags$p(
+          class = "row eq-box",
+          div(class = "col-md-6", tags$h4("Asymptomatic (Sensitive)"), tags$p(
             HTML(
               "$$\\frac{dA_s}{dt} = p\\lambda S (1 - p_s) - \\gamma_{as} A_s - \\tau_{as} A_s - \\mu_o A_s$$"
             )
           ), ),
-          div(class = "col-sm-6", tags$h4("Asymptomatic (Resistant)"), tags$p(
+          div(class = "col-md-6", tags$h4("Asymptomatic (Resistant)"), tags$p(
             HTML(
               "$$\\frac{dA_r}{dt} = (1-p)\\lambda S (1 - p_r) - \\gamma_{ar} A_r - \\tau_{ar} A_r - \\mu_o A_r$$"
             )
           ), ),
         ),
         div(
-          class = "row",
+          class = "row eq-box",
           div(
-            class = "col-sm-6",
+            class = "col-md-6",
             tags$h4("Gametocytes from Asymptomatic (Sensitive)"),
             tags$p(
               HTML(
@@ -830,7 +845,7 @@ ui <- dashboardPage(
             ),
           ),
           div(
-            class = "col-sm-6",
+            class = "col-md-6",
             tags$h4("Gametocytes from Asymptomatic (Resistant)"),
             tags$p(
               HTML(
@@ -840,7 +855,7 @@ ui <- dashboardPage(
           ),
         ),
         div(
-          class = "row",
+          class = "row eq-box",
           div(
             class = "col-sm-12",
             tags$h4("Symptomatic (Sensitive), k = 0,1,2"),
@@ -860,7 +875,7 @@ ui <- dashboardPage(
           ), ),
         ),
         div(
-          class = "row",
+          class = "row eq-box",
           div(
             class = "col-sm-12",
             tags$h4("Symptomatic (Resistant), k = 0,1,2"),
@@ -879,36 +894,41 @@ ui <- dashboardPage(
             HTML("$$\\frac{dI_{r,k}}{dt} = \\frac{dI_{r,k}}{dt} - I_{r,k}$$")
           ), ),
         ),
-        
+        div(
+          class = "row eq-box",
         tags$h4("Treatment Success (Sensitive), k = 1,2"),
         tags$p(
           HTML(
             "$$\\frac{dST_{is,k}}{dt} = (1 - Failrate_s) I_{s,k} - (\\mu_o + \\gamma_{infs} + \\tau_{nfs}) ST_{is,k}$$"
           )
+        )
         ),
-        
+        div(
+          class = "row eq-box",
         tags$h4("Treatment Failure (Sensitive), k = 1,2"),
         tags$p(
           HTML(
             "$$\\frac{dF_{is,k}}{dt} = Failrate_s I_{s,k} - (\\mu_o + \\gamma_{ifs} + \\tau_{fs}) F_{is,k}$$"
           )
-        ),
-        
+        )),
+        div(
+          class = "row eq-box",
         tags$h4("Treatment Success (Resistant)"),
         tags$p(
           HTML(
             "$$\\frac{dST_{ir,k}}{dt} = (1 - Failrate_r) I_{r,k} - (\\mu_o + \\gamma_{infr} + \\tau_{nfr}) ST_{ir,k}$$"
           )
-        ),
-        
+        )),
+        div(
+          class = "row eq-box",
         tags$h4("Treatment Failure (Resistant)"),
         tags$p(
           HTML(
             "$$\\frac{dF_{ir,k}}{dt} = Failrate_r I_{r,k} - (\\mu_o + \\gamma_{ifr} + \\tau_{fr}) F_{ir,k}$$"
           )
-        ),
+        )),
         div(
-          class = "row",
+          class = "row eq-box",
           
           tags$h4("Gametocytes from Symptomatic (Sensitive)"),
           div(class = "col-md-6", tags$p("For k = 0"), tags$p(
@@ -923,7 +943,7 @@ ui <- dashboardPage(
           ), ),
         ),
         div(
-          class = "row",
+          class = "row eq-box",
           tags$h4("Gametocytes from Symptomatic (Resistant)"),
           div(class = "col-md-6", tags$p("For k = 0"), tags$p(
             HTML(
@@ -936,20 +956,23 @@ ui <- dashboardPage(
             )
           ), ),
         ),
+        div(
+          class = "row eq-box",
         tags$h4("Recovered (Sensitive)"),
         tags$p(
           HTML(
             "$$\\frac{dR_s}{dt} = \\tau_{as}A_s + \\tau_{ags}GA_s + \\tau_{ntsd0}I_{s,0} + \\sum_{k=0}^{2} G_{is,k}\\tau_{is,k} + \\sum_{k=1}^{2}(ST_{is,k}\\tau_{nfs} + F_{is,k}\\tau_{fs}) - (\\mu_o + \\alpha)R_s$$"
           )
-        ),
-        
+        )),
+        div(
+          class = "row eq-box",
         tags$h4("Recovered (Resistant)"),
         tags$p(
           HTML(
             "$$\\frac{dR_r}{dt} = \\tau_{ar}A_r + \\tau_{agr}GA_r + \\tau_{ntrd0}I_{r,0} + \\sum_{k=0}^{2} G_{ir,k}\\tau_{ir,k} + \\sum_{k=1}^{2}(ST_{ir,k}\\tau_{nfr} + F_{ir,k}\\tau_{fr}) - (\\mu_o + \\alpha)R_r$$"
           )
         )
-      ),
+      )),
       tags$div(
         class = "general-card",
         tags$h3("Model Parameters"),
@@ -985,7 +1008,13 @@ ui <- dashboardPage(
               tags$td("Transmission from asymptomatic"),
               tags$td("per month")
             ),
-            
+            tags$tr(
+              tags$td(
+                tags$b("c", tags$sub("βr"))
+              ),
+              tags$td("Transmission fitness cost of resistant parasites"),
+              tags$td("Unitless")
+            ),
             tags$tr(
               tags$td(tags$b("γ", tags$sub("*"))),
               tags$td("Gametocyte production rates"),
@@ -2164,7 +2193,7 @@ server <- function(session, input, output) {
       type = "l",
       xlab = "Years",
       ylab = "FT",
-      main = "FT",
+      main = "Fraction of transmission",
       xlim = c(input$time_x, 2035),
       lwd = 2,
       col = 1,
@@ -2235,7 +2264,7 @@ server <- function(session, input, output) {
       type = "l",
       xlab = "Years",
       ylab = "Treated Contribution",
-      main = "CT_total",
+      main = "Treated Channel Contribution",
       xlim = c(input$time_x, 2035),
       lwd = 2,
       col = 1,
@@ -2270,7 +2299,7 @@ server <- function(session, input, output) {
       type = "l",
       xlab = "Years",
       ylab = "Untreated Contribution",
-      main = "CU_total",
+      main = "Untreated Channel Contribution",
       xlim = c(input$time_x, 2035),
       lwd = 2,
       col = 1,

@@ -5,6 +5,31 @@
   --tz-black: #111111;
   --tz-bg: #F4F6F8;
 }
+/* ===== width ~ 300px ===== */
+@media (max-width: 456px) {
+  .content-wrapper,
+  .right-side {
+    padding-top: 50px !important;
+  }
+}
+@media (max-width: 416px) {
+  .content-wrapper,
+  .right-side {
+    padding-top: 100px !important;
+  }
+}
+@media (max-width: 213px) {
+  .content-wrapper,
+  .right-side {
+    padding-top: 150px !important;
+  }
+}
+@media (max-width: 193px) {
+  .content-wrapper,
+  .right-side {
+    padding-top: 200px !important;
+  }
+}
 
 .flag-accent {
     height: 18px;
@@ -58,16 +83,25 @@ html {
   font-size: clamp(14px, 0.9vw + 0.3vh, 20px);
 }
 /* ===== TEXT ===== */
-p,span,div,li,td,th,label,input,textarea,button,
+p,div,li,td,th,label,input,textarea,button,span,
 a#goto_intro,a#goto_simulation,a#goto_about,a#goto_data
 {
   font-size: 1rem;
 }
-.MathJax { 
-  font-size: 1.5rem; !important; 
-}
-.MathJax_Display{
+.MathJax_Display {
+  display: block !important;
+  text-align: center !important;
+  margin: 0 auto !important;
   overflow-x: auto;
+}
+.MathJax_Display {
+  text-align: center !important;
+}
+
+.MathJax_Display > .MathJax {
+  display: inline-block !important;
+  transform: scale(1.2);
+  transform-origin: center center;
 }
 a.sidebar-toggle{
   font-size:0.8rem;
@@ -318,9 +352,20 @@ td, th {
   background: #fafbfc;
   border-radius: 16px;
   padding: 20px 24px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   margin: 20px 0;
   margin-bottom: 40px;
+}
+div#intro .general-card {
+  border-left: 6px solid var(--tz-blue);
+}
+.eq-box {
+  background: #f1f3f5;
+  border-left: 6px solid var(--tz-green); /* Tanzania */
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 16px 0;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.16);
 }
 .param-table thead th,
 .source-table thead th {
