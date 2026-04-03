@@ -3,8 +3,8 @@ library(deSolve)
 library(BayesianTools)
 library(scales)
 #Read model
-source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
-source("init_parameter_fitted.R")
+source("../model/model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
+source("init_parameter_optim_fitted.R")
 
 Tanzania_data <- read.csv("data/Reported malaria cases by method of confirmation.csv")
 Tanzania_Incidence <- Tanzania_data[6:14,c(1,4)]
@@ -80,7 +80,7 @@ times_fit <- seq(1, 12*26, 1) # 12 months per year, 18 years
 
 
 
-initial_guess <- c(1.5,1.3,1.05, 0.75)
+initial_guess <- c(1.4,1.3,1.05, 0.73)
 
 parameters_fitting$beta_s   <- c(initial_guess[1], initial_guess[1], initial_guess[1])
 parameters_fitting$beta_as  <- initial_guess[1]
@@ -252,6 +252,29 @@ plot(MCMC_out)
 gelmanDiagnostics(MCMC_out)
 correlationPlot(MCMC_out,start=1000,scaleCorText =F)
 marginalPlot(MCMC_out,start=1000)
-# plotDiagnostic(MCMC_out)
+plotDiagnostic(MCMC_out)
 
-# saveRDS(MCMC_out5, "MCMC_out.rds")
+saveRDS(MCMC_out, "MCMC_out.rds")
+
+# if Gelman Rubin multivariate psrf:  > 1.1 
+# it indicates that the chains have not converged well 
+# and may require more iterations or adjustments to the sampling process.
+# In such cases, you might consider increasing the number of iterations,
+# adjusting the proposal distribution, or checking for any issues 
+# in the model specification that could be affecting convergence.
+# we will run more iterations until the multivariate psrf is less than 1.1 to 
+# ensure better convergence of the MCMC chains.
+# MCMC_out_2nd <- runMCMC(MCMC_out)
+
+# if you want new settings, you can specify them in the runMCMC function, for example:
+# MCMC_out_2nd <- runMCMC(MCMC_out, settings = list(iterations = 15000, burnin = 5000))
+
+
+# summary(MCMC_out_2nd)
+# plot(MCMC_out_2nd)
+# gelmanDiagnostics(MCMC_out_2nd)
+# correlationPlot(MCMC_out_2nd,start=1000,scaleCorText =F)
+# marginalPlot(MCMC_out_2nd,start=1000)
+# plotDiagnostic(MCMC_out_2nd)
+# 
+# saveRDS(MCMC_out_2nd, "MCMC_out_2nd.rds")

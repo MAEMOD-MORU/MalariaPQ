@@ -4,7 +4,7 @@ library(BayesianTools)
 library(scales)
 #Read model
 source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
-source("init_parameter_fitted.R")
+source("init_parameter_optim_fitted.R")
 
 Tanzania_data <- read.csv("data/Reported malaria cases by method of confirmation.csv")
 Tanzania_Incidence <- Tanzania_data[6:14,c(1,4)]
@@ -79,16 +79,7 @@ for(i in 1:length(paramsample_test[,1])){
 
 length(ysample)
 
-# par(mfrow = c(1, 1))
-# plot(2015:2023,inc_model_2015_2023,xlab= "month",ylab ="Incidence",
-#      type = "l" ,col=2,ylim = c(0,1e7))
-# for (i in 1:length(ysample)) {
-#   x <- ysample[[i]]
-#   lines(2015:2023,x,col=alpha('gray', 1))
-# }
-# lines(2015:2023,inc_model_2015_2023,col="blue",lwd=2)
-# points(2015:2023,Tanzania_Incidence[, 2], col = "red",pch=19)
-
+# incidence plot
 plot(2000:2050,inc_model_2000_2050,xlab= "month",ylab ="Incidence",
      type = "l" ,col=2,ylim = c(0,3e7))
 for (i in 1:length(ysample)) {
@@ -98,6 +89,7 @@ for (i in 1:length(ysample)) {
 lines(2000:2050,inc_model_2000_2050,col="blue",lwd=2)
 points(2015:2023,Tanzania_Incidence[, 2], col = "red",pch=19)
 
+# K13 resistance ratio
 plot(2000:2050,ratio_2000_2050,xlab= "month",ylab ="Resistance Ratio",
      type = "l" ,col=2,ylim = c(0,1))
 for (i in 1:length(ysample2)) {
@@ -186,14 +178,14 @@ incidence_ci95 <- data.frame(
   `2.5%` = low,
   `97.5%` = up
 )
-write.csv(incidence_ci95, "incidence_ci95_09_feb.csv", row.names = FALSE)
+write.csv(incidence_ci95, "incidence_ci95.csv", row.names = FALSE)
 resistance_ratio_ci95 <- data.frame(
   Year = times_year,
   Median = unlist( CI95_2[2,]),
   `2.5%` = low2,
   `97.5%` = up2
 )
-write.csv(resistance_ratio_ci95, "K13_resistance_ratio_09_feb.csv", row.names = FALSE)
+write.csv(resistance_ratio_ci95, "K13_resistance_ratio.csv", row.names = FALSE)
 
 # If your sample has column names, this keeps them
 param_names <- c("Beta 1",	"Beta 2",	"Multiply Beta R",	
@@ -210,4 +202,4 @@ param_ci95_base <- data.frame(
 )
 
 param_ci95_base
-write.csv(param_ci95_base, "parameter_ci95_09_feb.csv", row.names = FALSE)
+write.csv(param_ci95_base, "parameter_ci95.csv", row.names = FALSE)

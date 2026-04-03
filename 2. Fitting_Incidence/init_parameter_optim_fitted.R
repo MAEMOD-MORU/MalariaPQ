@@ -100,18 +100,18 @@ g_ifs = c(1.21,1.21)  #1
 g_infr = c(0.038,0.038)
 g_ifr = c(2.42,2.42) 
 
-beta_is = 1.436          
-beta_as = 1.436       
-beta_is_2 = 1.436        
-beta_as_2 = 1.436       
-beta_r = 1.436 *1.05
-beta_ar = 1.436 *1.05 
-beta_ir_2 = 1.436 *1.05   
-beta_ar_2 = 1.436 *1.05
+beta_is = 1.446          
+beta_as = 1.446       
+beta_is_2 = 1.446        
+beta_as_2 = 1.446       
+beta_r = 1.446 *1.05
+beta_ar = 1.446 *1.05 
+beta_ir_2 = 1.446 *1.05   
+beta_ar_2 = 1.446 *1.05
 
 # mui <- 0.01
 # muo <- 0.01
-c_beta_r <- 0.7622   # resistant parasites transmit 20% less outside treatment
+c_beta_r <- 0.7385   # resistant parasites transmit 20% less outside treatment
 
 
 parameters <- list(

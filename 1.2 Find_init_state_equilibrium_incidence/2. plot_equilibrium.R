@@ -7,7 +7,7 @@ source("../model/model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
 
 #
 source("init_parameter_calibration_infection.R")
-Tanzania_data <- read.csv("../data/Reported malaria cases by method of confirmation.csv")
+Tanzania_Incidence <- read.csv("../data/Reported malaria cases by method of confirmation.csv")
 
 op<- readRDS("optimized_params_equilibrium.rds")
 init_state <- readRDS("init_state_2000.rds")
@@ -23,5 +23,5 @@ model_fitted <-  ode(y = init_state, times = times, func = Malaria_model_with_Ar
 model_fitted_inc <- colSums(matrix(model_fitted[,"inc"],   nrow = 12))
 
 plot(year,model_fitted_inc,type = "l",ylim = c(0,1e7))
-points(Tanzania_Incidence[,1],Tanzania_Incidence[,2],pch=16)
+points(Tanzania_Incidence[6:14,1],Tanzania_Incidence[6:14,4],pch=16,col="red")
 
