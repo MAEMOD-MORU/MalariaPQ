@@ -262,6 +262,7 @@ saveRDS(MCMC_out, "MCMC_out.rds")
 # In such cases, you might consider increasing the number of iterations,
 # adjusting the proposal distribution, or checking for any issues 
 # in the model specification that could be affecting convergence.
+
 # we will run more iterations until the multivariate psrf is less than 1.1 to 
 # ensure better convergence of the MCMC chains.
 # MCMC_out_2nd <- runMCMC(MCMC_out)
@@ -278,3 +279,23 @@ saveRDS(MCMC_out, "MCMC_out.rds")
 # plotDiagnostic(MCMC_out_2nd)
 # 
 # saveRDS(MCMC_out_2nd, "MCMC_out_2nd.rds")
+
+# if it don't work or psrf don't go down
+# you can try to adjust the proposal distribution,
+# for example by changing the scale of the proposal distribution 
+# or using a different sampling method.
+# exmaple:
+# density = function(par){
+# d.beta1 <-  dunif(par[1], min = 0.01, max = 3, log =TRUE) 
+# ...
+# sampler = function(n=1){
+# s.beta1 <- runif(n, min = 0.01, max = 3)
+# ...
+# change 5 to 3 in the prior distribution to make it narrower, 
+# which can help with convergence if the original range was too wide.
+# or change prior lower, upper, or best values to better reflect 
+# the expected parameter space based on prior knowledge or preliminary runs.
+# prior <- createPrior(density = density, sampler = sampler,
+# lower = c(rep(0.1, 2),1,0.1,1),
+# upper = c(rep(3, 2),1.5,1,50),
+# best = c(c(1.5,1.2,1.1, 0.75))

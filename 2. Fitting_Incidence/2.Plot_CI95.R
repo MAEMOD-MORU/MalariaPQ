@@ -3,19 +3,19 @@ library(deSolve)
 library(BayesianTools)
 library(scales)
 #Read model
-source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
+source("../model/model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
 source("init_parameter_optim_fitted.R")
 
-Tanzania_data <- read.csv("data/Reported malaria cases by method of confirmation.csv")
+Tanzania_data <- read.csv("../data/Reported malaria cases by method of confirmation.csv")
 Tanzania_Incidence <- Tanzania_data[6:14,c(1,4)]
-Tanzania_k13_Allele_frequency <- read.csv("data/Tanzania_K13_Allele_frequency.csv")[,2]
+Tanzania_k13_Allele_frequency <- read.csv("../data/Tanzania_K13_Allele_frequency.csv")[,2]
 
 init_state <- readRDS("init_state_2000.rds") # form 1.2 Find_init_state_equilibrium_incidence
 
 times <- seq(0,12*51)
 
 # Poputation
-totalpop_2000_2100 <- read.csv("data/Tanzania_pop_2000_2100.csv", header = TRUE)
+totalpop_2000_2100 <- read.csv("../data/Tanzania_pop_2000_2100.csv", header = TRUE)
 
 
 MCMC_out <- readRDS("MCMC_out_example.rds")
@@ -39,7 +39,7 @@ parameters_changing <- function(parameters,pars){
 
 # Pull a sample of 1000 parameter sets from our Markov chain
 paramsample_test <- getSample(MCMC_out, parametersOnly = T,
-                              numSamples = 300,start = 1000 )
+                              numSamples = 90,start = 1000 )
 
 parameters_list <- list()
 
