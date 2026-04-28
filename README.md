@@ -25,18 +25,18 @@ An R-based pipeline for fitting a compartmental epidemiological model of malaria
 Outputs from Steps 1.1 and 1.2 feed directly into Step 2.
 
 ```
-Tanzania Population Data ──►  1.1 Fit Population
+Tanzania Incidence Data  ──► 1.1 Fit Population
                                       │
                                       │  fitted parameters
                                       ▼
-                             1.2 Find Equilibrium Initial State
+Tanzania Incidence Data  ──► 1.2 Find Equilibrium Initial State
                              (fixed population size for tractable
                               equilibrium incidence calculation)
                                       │
                                       │  equilibrium initial state
                                       ▼
 Tanzania Incidence Data  ──►  2. Fit Incidence
-K13 Allele Frequency     ──►        │
+and K13 Allele Frequency              │
                                       │
                                       ▼
                                3. Plot Results
