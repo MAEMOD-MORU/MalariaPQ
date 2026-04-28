@@ -1,6 +1,6 @@
 # MalariaPQ — Single Low-Dose Primaquine Model
 
-![R](https://img.shields.io/badge/R-4.3.2-276DC3?style=flat&logo=r&logoColor=white)
+![R](https://img.shields.io/badge/R-%3E%3D4.3.2-276DC3?style=flat&logo=r&logoColor=white)
 
 An R-based pipeline for fitting a compartmental epidemiological model of malaria transmission with **single low-dose primaquine (SLD-PQ)** intervention.
 
@@ -70,7 +70,7 @@ Produces publication-ready figures from model fits and projections.
 
 ## Requirements
 
-- **R 4.3.2** — *"Eye Holes"* (2023-10-31 ucrt)
+- >= **R 4.3.2** — *"Eye Holes"* (2023-10-31 ucrt)
 
 Install required packages:
 
