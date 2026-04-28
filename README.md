@@ -64,7 +64,7 @@ Produces publication-ready figures from model fits and projections.
 | `Tanzania_K13_Allele_frequency.csv` | K13 propeller mutation allele frequencies (artemisinin partial resistance marker) |
 | `Tanzania_pop_2000_2100.csv` | Tanzania population estimates and projections 2000–2100 |
 
-> **Note:** SSP (Shared Socioeconomic Pathway) scenario files have been removed from the current analysis.
+> **Note:** SSP (Shared Socioeconomic Pathway) scenario files are included for demonstration purposes only.
 
 ---
 
