@@ -81,29 +81,11 @@ install.packages(c("deSolve","dplyr", "ggplot2", "scales", "BayesianTools"))
 ---
 
 ## Getting Started
-
-1. Clone the repository:
+Clone the repository:
    ```bash
    git clone https://github.com/MAEMOD-MORU/MalariaPQ.git
    cd MalariaPQ
    ```
-
-2. Run the pipeline in order:
-   ```r
-   # Step 1.1 — Fit population
-   source("1.1 Fitting_population/main.R")
-
-   # Step 1.2 — Find equilibrium initial state
-   source("1.2 Find_init_state_equilibrium_incidence/main.R")
-
-   # Step 2 — Fit incidence (requires outputs from 1.1 and 1.2)
-   source("2. Fitting_Incidence/main.R")
-
-   # Step 3 — Plot results
-   source("3. Plot Result/main.R")
-   ```
-
----
 
 ## Output
 
