@@ -70,7 +70,7 @@ Produces publication-ready figures from model fits and projections.
 
 ## Requirements
 
-- >= **R 4.3.2** — *"Eye Holes"* (2023-10-31 ucrt)
+- R >= 4.3.2 — "Eye Holes" (2023-10-31 ucrt) or later
 
 Install required packages:
 
