@@ -37,6 +37,26 @@ parameters_changing <- function(parameters,pars){
   return(parameters)
 }
 
+events <- list(
+  func = function(time, state, parameters) {
+    if (time == 1) {
+      state["Ir0"] <- state["Ir0"] + 1
+      state["Ir1"] <- state["Ir1"] + 1
+      # state["Ir2"] <- state["Ir2"] + 1
+      state["Ar"] <- state["Ar"] + 1
+      
+      # reduce Is
+      state["Is0"] <- state["Is0"] -1
+      state["Is1"] <- state["Is1"] -1
+      # state["Is2"] <- state["Is2"] -1
+      state["As"] <- state["As"] -1
+      
+    }
+    return(state)
+  },
+  time =1  # only one time point
+)
+
 # Pull a sample of 1000 parameter sets from our Markov chain
 paramsample_test <- getSample(MCMC_out, parametersOnly = T,
                               numSamples = 90,start = 1000 )
@@ -46,7 +66,7 @@ parameters_list <- list()
 times_fit <- seq(1, 12*51, 1) # 12 months per year, 9 years-
 
 for (i in 1:length(paramsample_test[,1])) {
-  parameters_list[[i]] <- parameters_changing(parameters_fitting,paramsample_test[i,])
+  parameters_list[[i]] <- parameters_changing(parameters,paramsample_test[i,])
 }
 
 pb <- txtProgressBar(min = 0, max = length(paramsample_test[,1]), style = 3)
