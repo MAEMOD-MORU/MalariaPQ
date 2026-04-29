@@ -5,10 +5,10 @@ total_inc <- 1000
 
 prob_sym_res <-0
 
-mui <- 0.0226    # form 1.1 Fitting_population
-muo <- 0.0203    # form 1.1 Fitting_population
-mui_before <- 0.0226    # form 1.1 Fitting_population
-muo_before <- 0.0203    # form 1.1 Fitting_population
+mui <- 0.0226    # from 1.1 Fitting_population
+muo <- 0.0203    # from 1.1 Fitting_population
+mui_before <- 0.0226    # from 1.1 Fitting_population
+muo_before <- 0.0203    # from 1.1 Fitting_population
 
 # Initial States from UI Inputs
 init_total_IAs <- total_inc*(1-prob_sym_res)
@@ -100,18 +100,18 @@ g_ifs = c(1.21,1.21)  #1
 g_infr = c(0.038,0.038)
 g_ifr = c(2.42,2.42) 
 
-beta_is = 1.446          
-beta_as = 1.446       
-beta_is_2 = 1.446        
-beta_as_2 = 1.446       
-beta_r = 1.446 *1.05
-beta_ar = 1.446 *1.05 
-beta_ir_2 = 1.446 *1.05   
-beta_ar_2 = 1.446 *1.05
+# from fitting 2. Fitting_Incidence
+beta_is = 1.421           # par 1
+beta_as = 1.421           # par 1
+beta_is_2 = 1.165         # par 2
+beta_as_2 = 1.165         # par 2
+beta_r = 1.421 *1.131     # par 1 * par 3
+beta_ar = 1.421 *1.131    # par 1 * par 3
+beta_ir_2 = 1.165 *1.131  # par 2 * par 3
+beta_ar_2 = 1.165 *1.131  # par 2 * par 3
 
-# mui <- 0.01
-# muo <- 0.01
-c_beta_r <- 0.7385   # resistant parasites transmit 20% less outside treatment
+
+c_beta_r <- 0.707  # from fitting 2. Fitting_Incidence (par 4)
 
 
 parameters <- list(
@@ -131,7 +131,7 @@ parameters <- list(
   prob_sym_r = prob_sym_r,
   start_d = 6000,# 10 years after 3500 months
   start_m = 12*1000, # 2015
-  start_b = 12*1000, # 2015
+  start_b = 12*21, # 2015
   t_long = 12*100, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
   Fail_rate_r = 0.13,
@@ -143,7 +143,7 @@ parameters <- list(
   beta_s_2 =  c(beta_is_2, beta_is_2, beta_is_2),
   beta_as_2 = beta_as_2,
   beta_r_2 = c(beta_ir_2,beta_ir_2,beta_ir_2),
-  beta_r_2 = beta_ar_2,
+  beta_ar_2 = beta_ar_2,
   
   alpha = 1.07 / 12, #  doi:10.1371/journal.pone.0001767
   τigs=τigs,

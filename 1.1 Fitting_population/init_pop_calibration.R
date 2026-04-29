@@ -132,7 +132,7 @@ parameters <- list(
   start_b = 12*1000, # 2015
   t_long = 12*100, # 2,5,10 years 
   Fail_rate_s = 0.025, # Fail Treatment of ACT
-  Fail_rate_r = 0.025,
+  Fail_rate_r = 0.13,
   
   beta_s = c(beta_is, beta_is, beta_is),
   beta_r = c(beta_r, beta_r,beta_r),
