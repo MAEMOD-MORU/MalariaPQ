@@ -22,10 +22,6 @@ Finds the **equilibrium initial state** of the malaria transmission model by fit
 ## Workflow
 
 ```
-../1.1 Fitting_population/
-calibration_population_results.rds      # Demographic parameters from Step 1.1
-        │
-        ▼
 init_parameter_calibration_infection.R  # 1. Load params, fix population size
         │
         ▼
