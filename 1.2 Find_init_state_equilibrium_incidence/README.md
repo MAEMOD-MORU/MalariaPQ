@@ -22,10 +22,6 @@ Finds the **equilibrium initial state** of the malaria transmission model by fit
 ## Workflow
 
 ```
-../1.1 Fitting_population/
-calibration_population_results.rds      # Demographic parameters from Step 1.1
-        │
-        ▼
 init_parameter_calibration_infection.R  # 1. Load params, fix population size
         │
         ▼
@@ -52,8 +48,8 @@ Fits transmission rate parameters by minimising the difference between modelled 
 
 | Parameter | Description |
 |---|---|
-| `beta_s` | Transmission rate — sensitive strain, season 1 |
-| `beta_s_2` | Transmission rate — sensitive strain, season 2 |
+| `beta_s` | Transmission rate — Before 2020 |
+| `beta_s_2` | Transmission rate — After 2020 |
 
 The resistant strain transmission rates are derived from these via the relative fitness parameter `c_beta_r`.
 
