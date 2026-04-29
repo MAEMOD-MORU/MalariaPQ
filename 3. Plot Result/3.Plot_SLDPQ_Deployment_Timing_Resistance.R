@@ -94,7 +94,7 @@ recheck_init_state <- function(out_event, center_pos, threshold,
 }
 
 # =============================================
-# recheck ทุก threshold
+# recheck threshold
 # =============================================
 params_check        <- parameters
 params_check$start_d <- 1000
@@ -111,7 +111,7 @@ init_states_checked <- mapply(
 names(init_states_checked) <- names(pos)
 
 # =============================================
-# ใช้ init_states_checked แทน init_states
+# Use init_states_checked instead of init_states
 # =============================================
 init_list <- list(
   init_states_checked$p0_01,
@@ -135,45 +135,7 @@ df_dash <- bind_rows(mapply(
 df_all <- bind_rows(df_solid, df_dash)
 df_all$Threshold <- factor(df_all$Threshold, levels = threshold_labels)
 
-time_new <- seq(1, 12*10)
 
-run_ratio_df <- function(init_st, pars, time_run, label, linetype) {
-  out <- ode(y     = init_st,
-             times = time_run,
-             func  = Malaria_model_with_Array,
-             parms = pars)
-  
-  mat   <- matrix(out[, "inc_sym_r"] / out[, "inc_sym"], nrow = 12)
-  ratio <- colMeans(mat)
-  
-  data.frame(
-    Year      = 1:10,
-    Ratio     = ratio,
-    Threshold = label,
-    Linetype  = linetype
-  )
-}
-
-threshold_labels <- c("0.01", "0.05", "0.10", "0.15")
-init_list        <- list(init_states$p0_01, init_states$p0_05,
-                         init_states$p0_1,  init_states$p0_15)
-
-# (no D2)
-df_solid <- bind_rows(mapply(
-  function(init, label) run_ratio_df(init, params_no_switch, time_new, label, "solid"),
-  init_list, threshold_labels, SIMPLIFY = FALSE
-))
-
-# (start_d at t=1)
-df_dash <- bind_rows(mapply(
-  function(init, label) run_ratio_df(init, params_switch, time_new, label, "dashed"),
-  init_list, threshold_labels, SIMPLIFY = FALSE
-))
-
-df_all <- bind_rows(df_solid, df_dash)
-df_all$Threshold <- factor(df_all$Threshold, levels = threshold_labels)
-
-# --- สี ---
 colors_manual <- c(
   "0.01" = "#4169E1",
   "0.05" = "#CC0000",
@@ -194,13 +156,13 @@ ggplot(df_all, aes(x = Year, y = Ratio,
   scale_linetype_identity() +
   scale_x_continuous(
     breaks       = 1:10,
-    minor_breaks = seq(1, 10, 0.5),   # minor tick แกน X
+    minor_breaks = seq(1, 10, 0.5),   # minor tick
     expand       = c(0.01, 0)
   ) +
   scale_y_continuous(
     limits       = c(0, 1),
     breaks       = seq(0, 1, 0.2),
-    minor_breaks = seq(0, 1, 0.05),   # minor tick ทุก 0.05 — ครอบ 0.05, 0.10, 0.15
+    minor_breaks = seq(0, 1, 0.05),   # minor tick
     expand       = c(0, 0)
   ) +
   labs(
@@ -210,7 +172,7 @@ ggplot(df_all, aes(x = Year, y = Ratio,
   theme_bw(base_size = 12) +
   theme(
     panel.grid.major   = element_line(color = "grey85", linewidth = 0.4),
-    panel.grid.minor   = element_blank(),          # ไม่แสดง grid minor
+    panel.grid.minor   = element_blank(),          # No grid
     legend.position    = "right",
     legend.title       = element_text(face = "bold", size = 10),
     legend.text        = element_text(size = 10),
@@ -219,13 +181,13 @@ ggplot(df_all, aes(x = Year, y = Ratio,
     axis.text          = element_text(size = 10),
     axis.ticks         = element_line(color = "black"),
     axis.ticks.length  = unit(0.15, "cm"),          # major tick
-    axis.minor.ticks.length = rel(0.5)              # minor tick สั้นกว่า major
+    axis.minor.ticks.length = rel(0.5)              # minor tick
   ) +
   guides(
     color    = guide_legend(override.aes = list(linewidth = 1.5)),
     linetype = "none",
-    x        = guide_axis(minor.ticks = TRUE),      # เปิด minor tick แกน X
-    y        = guide_axis(minor.ticks = TRUE)       # เปิด minor tick แกน Y
+    x        = guide_axis(minor.ticks = TRUE),      #  minor tick X
+    y        = guide_axis(minor.ticks = TRUE)       #  minor tick Y
   )
 
 # --- 2 sheet ---
