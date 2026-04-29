@@ -52,8 +52,8 @@ Fits transmission rate parameters by minimising the difference between modelled 
 
 | Parameter | Description |
 |---|---|
-| `beta_s` | Transmission rate — sensitive strain, season 1 |
-| `beta_s_2` | Transmission rate — sensitive strain, season 2 |
+| `beta_s` | Transmission rate — Before 2020 |
+| `beta_s_2` | Transmission rate — After 2020 |
 
 The resistant strain transmission rates are derived from these via the relative fitness parameter `c_beta_r`.
 
