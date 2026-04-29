@@ -83,7 +83,7 @@ thresholds <- c(0.01, 0.05, 0.1, 0.15)
 colors     <- c("0.01" = "#4472C4", "0.05" = "#FF0000", 
                 "0.10" = "#00B050", "0.15" = "#000000")
 
-# --- params 2 แบบ ---
+# params
 params_no_switch        <- parameters
 params_no_switch$start_d <- 1000   # ไม่ switch
 params_no_switch$start_b <- 1000
@@ -94,7 +94,6 @@ params_switch$start_b   <- 1000
 
 time_new <- seq(1, 12*10)
 
-# --- รัน ทั้ง 2 แบบ ---
 run_ratio_df <- function(init_st, pars, time_run, label, linetype) {
   out <- ode(y     = init_st,
              times = time_run,
@@ -116,13 +115,13 @@ threshold_labels <- c("0.01", "0.05", "0.10", "0.15")
 init_list        <- list(init_states$p0_01, init_states$p0_05,
                          init_states$p0_1,  init_states$p0_15)
 
-# เส้นทึบ (no switch)
+# (no D2)
 df_solid <- bind_rows(mapply(
   function(init, label) run_ratio_df(init, params_no_switch, time_new, label, "solid"),
   init_list, threshold_labels, SIMPLIFY = FALSE
 ))
 
-# เส้นจุด (switch at t=1)
+# (start_d at t=1)
 df_dash <- bind_rows(mapply(
   function(init, label) run_ratio_df(init, params_switch, time_new, label, "dashed"),
   init_list, threshold_labels, SIMPLIFY = FALSE
@@ -149,7 +148,7 @@ ggplot(df_all, aes(x = Year, y = Ratio,
     values = colors_manual,
     name   = "SLDPQ Deployment Threshold\n(Symptomatic Resistant Fraction)"
   ) +
-  scale_linetype_identity() +   # ใช้ค่า "solid"/"dashed" ตรงๆ
+  scale_linetype_identity() + 
   scale_x_continuous(breaks = 1:10, expand = c(0.01, 0)) +
   scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2), expand = c(0, 0)) +
   labs(
@@ -169,7 +168,7 @@ ggplot(df_all, aes(x = Year, y = Ratio,
   ) +
   guides(
     color    = guide_legend(override.aes = list(linewidth = 1.5)),
-    linetype = "none"   # ไม่แสดง linetype legend แยก
+    linetype = "none"
   )
 
 # --- 2 sheet ---
