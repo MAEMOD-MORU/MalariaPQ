@@ -44,53 +44,96 @@ extract_state <- function(out, row) {
 
 init_states <- lapply(pos, function(p) extract_state(out_event, p))
 
-# Run forward simulations from each threshold state
-params_fwd        <- parameters
-params_fwd$start_d <- 1000
-params_fwd$start_b <- 1000
-time_fwd          <- seq(0, 12*10 - 1)
-
-run_scenario <- function(init) {
-  out <- ode(y = init, times = time_fwd, func = Malaria_model_with_Array, parms = params_fwd)
-  list(
-    inc   = colSums(matrix(out[,"inc"],   nrow = 12)),
-    inc_s = colSums(matrix(out[,"inc_s"], nrow = 12)),
-    inc_r = colSums(matrix(out[,"inc_r"], nrow = 12)),
-    ratio = colMeans(matrix(out[,"inc_r"] / out[,"inc"], nrow = 12))
+recheck_init_state <- function(out_event, center_pos, threshold,
+                               params_run, search_range = 12) {
+  
+  time_check <- seq(1, 12)
+  n          <- nrow(out_event)
+  
+  candidates <- seq(
+    max(1, center_pos - search_range),
+    min(n, center_pos + search_range)
   )
+  
+  best_idx  <- center_pos
+  best_diff <- Inf
+  best_mean <- NA
+  
+  for (t_idx in candidates) {
+    
+    init_try <- extract_state(out_event, t_idx)
+    
+    out_try <- tryCatch(
+      ode(y     = init_try,
+          times = time_check,
+          func  = Malaria_model_with_Array,
+          parms = params_run),
+      error = function(e) NULL
+    )
+    
+    if (is.null(out_try)) next
+    
+    # mean inc_sym_r / inc_sym ใน 12 เดือนแรก
+    ratio_12  <- out_try[, "inc_sym_r"] / out_try[, "inc_sym"]
+    mean_12   <- mean(ratio_12, na.rm = TRUE)
+    diff_12   <- abs(mean_12 - threshold)
+    
+    if (diff_12 < best_diff) {
+      best_diff <- diff_12
+      best_idx  <- t_idx
+      best_mean <- mean_12
+    }
+  }
+  
+  message(sprintf(
+    "Threshold=%.2f | original_pos=%d | best_pos=%d | mean_12=%.4f | diff=%.4f",
+    threshold, center_pos, best_idx, best_mean, best_diff
+  ))
+  
+  extract_state(out_event, best_idx)
 }
 
-results <- lapply(init_states, run_scenario)
+# =============================================
+# recheck ทุก threshold
+# =============================================
+params_check        <- parameters
+params_check$start_d <- 1000
+params_check$start_b <- 1000
 
-# Plot incidence resistant
-colors <- c("black","purple","red","blue")
-labels <- paste("Initial Proportion Resistant", thresholds)
+init_states_checked <- mapply(
+  function(p, th) recheck_init_state(out_event, 
+                                     center_pos  = p, 
+                                     threshold   = th,
+                                     params_run  = params_check),
+  pos, thresholds,
+  SIMPLIFY = FALSE
+)
+names(init_states_checked) <- names(pos)
 
-plot(results[[1]]$inc_r, type="l", col=colors[1], lwd=2,
-     ylim=c(0, 1.1*max(sapply(results, function(r) max(r$inc_r)))),
-     xlab="Years", ylab="Incidence", main="Incidence Resistant")
-for (i in 2:4) lines(results[[i]]$inc_r, col=colors[i], lwd=2)
-legend("topleft", legend=labels, col=colors, lwd=2, cex=1)
+# =============================================
+# ใช้ init_states_checked แทน init_states
+# =============================================
+init_list <- list(
+  init_states_checked$p0_01,
+  init_states_checked$p0_05,
+  init_states_checked$p0_1,
+  init_states_checked$p0_15
+)
 
-# Plot resistance ratio
-plot(results[[1]]$ratio, type="l", col=colors[1], lwd=2, ylim=c(0,1),
-     xlab="Years", ylab="Ratio", main="Incidence Resistant / Total Incidence")
-for (i in 2:4) lines(results[[i]]$ratio, col=colors[i], lwd=2)
-for (i in 1:4) abline(h=thresholds[i], col=colors[i], lty=2)
-legend("bottomright", legend=labels, col=colors, lwd=2, cex=1)
+# solid (no switch)
+df_solid <- bind_rows(mapply(
+  function(init, label) run_ratio_df(init, params_no_switch, time_new, label, "solid"),
+  init_list, threshold_labels, SIMPLIFY = FALSE
+))
 
-thresholds <- c(0.01, 0.05, 0.1, 0.15)
-colors     <- c("0.01" = "#4472C4", "0.05" = "#FF0000", 
-                "0.10" = "#00B050", "0.15" = "#000000")
+# dashed (switch at t=1)
+df_dash <- bind_rows(mapply(
+  function(init, label) run_ratio_df(init, params_switch, time_new, label, "dashed"),
+  init_list, threshold_labels, SIMPLIFY = FALSE
+))
 
-# params
-params_no_switch        <- parameters
-params_no_switch$start_d <- 1000   # ไม่ switch
-params_no_switch$start_b <- 1000
-
-params_switch           <- parameters
-params_switch$start_d   <- 1      # switch ทันที (เส้นจุด)
-params_switch$start_b   <- 1000
+df_all <- bind_rows(df_solid, df_dash)
+df_all$Threshold <- factor(df_all$Threshold, levels = threshold_labels)
 
 time_new <- seq(1, 12*10)
 
@@ -148,27 +191,41 @@ ggplot(df_all, aes(x = Year, y = Ratio,
     values = colors_manual,
     name   = "SLDPQ Deployment Threshold\n(Symptomatic Resistant Fraction)"
   ) +
-  scale_linetype_identity() + 
-  scale_x_continuous(breaks = 1:10, expand = c(0.01, 0)) +
-  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, 0.2), expand = c(0, 0)) +
+  scale_linetype_identity() +
+  scale_x_continuous(
+    breaks       = 1:10,
+    minor_breaks = seq(1, 10, 0.5),   # minor tick แกน X
+    expand       = c(0.01, 0)
+  ) +
+  scale_y_continuous(
+    limits       = c(0, 1),
+    breaks       = seq(0, 1, 0.2),
+    minor_breaks = seq(0, 1, 0.05),   # minor tick ทุก 0.05 — ครอบ 0.05, 0.10, 0.15
+    expand       = c(0, 0)
+  ) +
   labs(
     x = "Years",
     y = "Proportion resistant\n(symptomatic incidence)"
   ) +
   theme_bw(base_size = 12) +
   theme(
-    panel.grid.major  = element_line(color = "grey85", linewidth = 0.4),
-    panel.grid.minor  = element_blank(),
-    legend.position   = "right",
-    legend.title      = element_text(face = "bold", size = 10),
-    legend.text       = element_text(size = 10),
-    legend.key.width  = unit(1.8, "cm"),
-    axis.title        = element_text(size = 11),
-    axis.text         = element_text(size = 10)
+    panel.grid.major   = element_line(color = "grey85", linewidth = 0.4),
+    panel.grid.minor   = element_blank(),          # ไม่แสดง grid minor
+    legend.position    = "right",
+    legend.title       = element_text(face = "bold", size = 10),
+    legend.text        = element_text(size = 10),
+    legend.key.width   = unit(1.8, "cm"),
+    axis.title         = element_text(size = 11),
+    axis.text          = element_text(size = 10),
+    axis.ticks         = element_line(color = "black"),
+    axis.ticks.length  = unit(0.15, "cm"),          # major tick
+    axis.minor.ticks.length = rel(0.5)              # minor tick สั้นกว่า major
   ) +
   guides(
     color    = guide_legend(override.aes = list(linewidth = 1.5)),
-    linetype = "none"
+    linetype = "none",
+    x        = guide_axis(minor.ticks = TRUE),      # เปิด minor tick แกน X
+    y        = guide_axis(minor.ticks = TRUE)       # เปิด minor tick แกน Y
   )
 
 # --- 2 sheet ---
