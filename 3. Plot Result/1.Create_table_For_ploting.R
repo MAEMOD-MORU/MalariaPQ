@@ -48,8 +48,6 @@ k  <- 0
 
 for (asym in asym_levels) {
   prob_sym <- 1 - asym / 100
-  
-  # ✅ Baseline = scenario ที่ cov=0% (D2=0, switches at 2025 แต่ไม่มี D2)
   pars_cov0 <- parameters
   pars_cov0$prob_sym_s <- prob_sym
   pars_cov0$prob_sym_r <- prob_sym
@@ -90,7 +88,6 @@ close(pb)
 
 df_results <- do.call(rbind, results)
 
-# cov=0 ต้องได้ 0% เสมอ (เทียบกับตัวเอง)
 df_results <- df_results %>%
   mutate(across(starts_with("red_"), ~ ifelse(D2_coverage == 0, 0, .)))
 
