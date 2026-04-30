@@ -25,7 +25,7 @@ An R-based pipeline for fitting a compartmental epidemiological model of malaria
 Outputs from Steps 1.1 and 1.2 feed directly into Step 2.
 
 ```
-Tanzania Incidence Data  ──► 1.1 Fit Population
+Tanzania population Data ──► 1.1 Fit Population
                                       │
                                       │  fitted parameters
                                       ▼
