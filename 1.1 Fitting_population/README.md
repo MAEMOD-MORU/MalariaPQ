@@ -37,7 +37,6 @@ Sets up everything needed before running the model:
 
 - **Initial population**: Tanzania year-2000 population (`initP = 34,260,139`)
 - **Compartment state vector** (`state`): Susceptible (`S`), Symptomatic infected sensitive/resistant (`Is`, `Ir`) across treatment day strata (D0/D1/D2), Asymptomatic (`As`, `Ar`), Gametocyte carriers (`GIs`, `GIr`, `GAs`, `GAr`), Treatment success/failure groups (`Stis`, `Fis`, `Stir`, `Fir`), Recovered (`Rs`, `Rr`)
-- **Fixed parameters**: transmission rates (`beta_s`, `beta_r`), gametocyte rates, recovery rates, treatment failure rates (`Fail_rate_s = 0.025`, `Fail_rate_r = 0.13`), seasonal forcing (`flo`, `amp`, `period`)
 
 ### `1.calibration_pop.R`
 Fits monthly **birth rate** (`mui`) and **death rate** (`muo`) by minimising RMSD between modelled and observed total population:
