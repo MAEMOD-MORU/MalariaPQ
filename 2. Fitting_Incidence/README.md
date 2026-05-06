@@ -122,7 +122,7 @@ saveRDS(MCMC_out_2nd, "MCMC_out_2nd.rds")
 
 | File | Used by | Description |
 |---|---|---|
-| `MCMC_out.rds` | `3. Results/` | Full posterior samples from 3 MCMC chains |
+| `MCMC_out.rds` | `3. Results/Figure 1 CI95` | Full posterior samples from 3 MCMC chains |
 
 ---
 
