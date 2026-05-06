@@ -9,7 +9,6 @@ library(openxlsx)
 source("../../model/model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
 source("../init_parameter_MCMC.R")
 
-Tanzania_k13_Allele_frequency <- read.csv("../../data/Tanzania_K13_Allele_frequency.csv")[, 2]
 init_state <- readRDS("../init_state_2000.rds")
 times <- seq(1, 12 * 51)
 
