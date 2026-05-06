@@ -13,7 +13,7 @@ An R-based pipeline for fitting a compartmental epidemiological model of malaria
 ├── 1.1 Fitting_population/                      # Fit model to population data
 ├── 1.2 Find_init_state_equilibrium_incidence/   # Find equilibrium initial state
 ├── 2. Fitting_Incidence/                        # Fit model to observed incidence
-├── 3. Plot Result/                              # Generate output figures
+├── 3. Result/                                   # Generate output figures and files that using figures
 ├── Model/                                       # ODE system and parameter definitions
 └── data/                                        # Input datasets
 ```
@@ -75,7 +75,7 @@ Produces publication-ready figures from model fits and projections.
 Install required packages:
 
 ```r
-install.packages(c("deSolve","dplyr", "ggplot2", "scales", "BayesianTools"))
+install.packages(c("deSolve","dplyr", "ggplot2", "scales", "BayesianTools","openxlsx"))
 ```
 
 ---
