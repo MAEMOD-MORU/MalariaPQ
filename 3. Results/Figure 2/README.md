@@ -37,14 +37,14 @@ Generates a multi-sheet Excel workbook comparing model projections across **D2 t
 | **D1** | Fixed at 0 |
 | **D0** | `1 − D2` |
 | **D2 start year** | 2025 (`start_d = 12 × 26`) |
-
+### Note: baseline (D0=0.67, D1=0.33, D2=0) 
 ---
 
 ## Output Columns (per sheet)
 
 | Column | Description |
 |---|---|
-| `Asym` | % asymptomatic (`"Baseline"` for first row) |
+| `Asym` | % asymptomatic |
 | `c_beta` | Competitive fitness of resistant strain |
 | `D0`, `D1`, `D2` | Treatment proportion for each day-regimen |
 | `Incidence_Res_year_1` | Annual resistant incidence at year 2026 |
