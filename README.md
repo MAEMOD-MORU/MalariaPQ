@@ -75,7 +75,7 @@ Produces publication-ready figures from model fits and projections.
 Install required packages:
 
 ```r
-install.packages(c("deSolve","dplyr", "ggplot2", "scales", "BayesianTools"))
+install.packages(c("deSolve","dplyr", "ggplot2", "scales", "BayesianTools","openxlsx"))
 ```
 
 ---
