@@ -1,4 +1,5 @@
 # MalariaPQ
+![R](https://img.shields.io/badge/R-%3E%3D4.3.2-276DC3?style=flat&logo=r&logoColor=white)
 
 An interactive R Shiny dashboard for simulating *Plasmodium falciparum* transmission dynamics and evaluating the impact of artemisinin-based combination therapy (ACT) with and without single low-dose primaquine (PQ) on gametocyte prevalence and artemisinin resistance propagation.
 
@@ -52,10 +53,12 @@ All parameters are adjustable via sliders:
 
 ---
 
-## Installation
+## Requirements
 
+- R >= 4.3.2 — "Eye Holes" (2023-10-31 ucrt) or later
+
+Install required packages:
 ```r
-# Install required packages
 install.packages(c(
   "shiny",
   "shinydashboard",
