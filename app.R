@@ -8,12 +8,12 @@ library(bsplus)
 library(shinycssloaders)
 
 # Read model
-source("model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
-init_state <- readRDS("init_state_d1_33.rds")
-source("init_parameter_equilibrium_birth_2_rate_2beta_res_fitted_Tanzania.R")
+source("model/model_D0_33_D1_67_baseline_change_birth_death_2betaSets_SS.R")
+init_state <- readRDS("data/init_state_d1_33.rds")
+source("data/init_parameter_equilibrium_birth_2_rate_2beta_res_fitted_Tanzania.R")
 tanzania_Incidence <- read.csv("data/Tanzania_incidence.csv")
 tanzania_Population <- read.csv("data/Tanzania_pop_2000_2100.csv", header = TRUE)[1:51, 2]
-init_state_tanzania <- readRDS("init_state_d1_33.rds")
+init_state_tanzania <- readRDS("data/init_state_d1_33.rds")
 parameters <- parameters_Tanzania
 
 events <- list(
@@ -938,7 +938,7 @@ ui <- dashboardPage(
           ), ),
           div(class = "col-md-6", tags$p("For k = 1,2"), tags$p(
             HTML(
-              "$$\\frac{dG_{is,k}}{dt} = I_{s,k}\\gamma_{is,k} - (\\mu_o + \\tau_{is,k}) G_{is,k} + ST_{is,k}\\tau_{nfs} + F_{is,k}\\tau_{fs}$$"
+              "$$\\frac{dG_{is,k}}{dt} = I_{s,k}\\gamma_{is,k} - (\\mu_o + \\tau_{is,k}) G_{is,k} + ST_{is,k}\\gamma_{infs} + F_{is,k}\\gamma_{ifs}$$"
             )
           ), ),
         ),
@@ -952,7 +952,7 @@ ui <- dashboardPage(
           ), ),
           div(class = "col-md-6", tags$p("For k = 1,2"), tags$p(
             HTML(
-              "$$\\frac{dG_{ir,k}}{dt} = I_{r,k}\\gamma_{ir,k} - (\\mu_o + \\tau_{ir,k}) G_{ir,k} + ST_{ir,k}\\tau_{nfr} + F_{ir,k}\\tau_{fr}$$"
+              "$$\\frac{dG_{ir,k}}{dt} = I_{r,k}\\gamma_{ir,k} - (\\mu_o + \\tau_{ir,k}) G_{ir,k} + ST_{ir,k}\\gamma_{infr} + F_{ir,k}\\gamma_{ifr}$$"
             )
           ), ),
         ),
