@@ -4,18 +4,6 @@ An interactive R Shiny dashboard for simulating *Plasmodium falciparum* transmis
 
 ---
 
-## Overview
-
-MalariaPQ implements a deterministic compartmental ODE model that stratifies the human population by:
-
-- **Clinical presentation** — asymptomatic vs. symptomatic infection
-- **Treatment pathway** — no treatment (D0), ACT alone (D1), or ACT + low-dose primaquine (D2)
-- **Parasite phenotype** — artemisinin-sensitive vs. artemisinin-resistant
-
-The model explicitly tracks gametocyte-producing compartments to capture the infectious reservoir driving onward transmission, and incorporates seasonal forcing of the force of infection.
-
----
-
 ## App Structure
 
 ```
@@ -39,17 +27,9 @@ The model explicitly tracks gametocyte-producing compartments to capture the inf
         ├── figure1.png
         └── figure2.png
 ```
-
 ---
 
-## Features
-
-### Introduction tab
-- Full model description with compartment diagrams
-- ODE equations rendered with MathJax
-- Parameter table
-
-### Simulation tab
+## Simulation tab
 Interactive plots (baseline vs. D2 treatment scenario) covering:
 
 | Plot | Description |
@@ -62,7 +42,7 @@ Interactive plots (baseline vs. D2 treatment scenario) covering:
 | Gametocyte Infections (Sensitive vs. Resistant) | Gametocyte reservoir by parasite type |
 | Treated / Untreated Channel Contribution | CT_total and CU_total over time |
 
-### Sidebar controls
+## Sidebar controls
 All parameters are adjustable via sliders:
 
 - **Transmissibility** — β (symptomatic & asymptomatic) for two time periods; resistant multiplier; fitness cost
