@@ -25,7 +25,6 @@ An interactive R Shiny dashboard for simulating *Plasmodium falciparum* transmis
     ├── js/toTheTop.js
     └── img/
         ├── figure1.png
-        └── figure2.png
 ```
 ---
 
