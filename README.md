@@ -94,11 +94,11 @@ Clone the repository:
 - Incidence fits with 95% confidence intervals
 - Model projections with and without SLD-PQ intervention
 
----
+## Web App
 
-## Related
+An interactive simulation dashboard is available online: **[moru.shinyapps.io/MalariaPQ/](https://moru.shinyapps.io/MalariaPQ/)**
 
-- **MAEMOD-MORU** — [github.com/MAEMOD-MORU](https://github.com/MAEMOD-MORU)
+Source code for the web app : [https://github.com/MAEMOD-MORU/MalariaPQ/tree/web](https://github.com/MAEMOD-MORU/MalariaPQ/tree/web)
 
 ---
 
